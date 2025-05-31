@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,6 +38,101 @@ export const PropertiesPanel = ({ selectedBlock, onUpdateBlock }) => {
 
   const renderContentEditor = () => {
     switch (selectedBlock.type) {
+      case 'navbar-logo':
+      case 'navbar-text':
+        return (
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="brandText">{selectedBlock.type === 'navbar-logo' ? 'Logo Text' : 'Brand Text'}</Label>
+              <Input
+                id="brandText"
+                value={selectedBlock.content[selectedBlock.type === 'navbar-logo' ? 'logoText' : 'brandText'] || ''}
+                onChange={(e) => updateContent(selectedBlock.type === 'navbar-logo' ? 'logoText' : 'brandText', e.target.value)}
+                placeholder={selectedBlock.type === 'navbar-logo' ? 'Brand' : 'Company'}
+              />
+            </div>
+            <div>
+              <Label htmlFor="link1">Navigation Link 1</Label>
+              <Input
+                id="link1"
+                value={selectedBlock.content.link1 || ''}
+                onChange={(e) => updateContent('link1', e.target.value)}
+                placeholder="Home"
+              />
+            </div>
+            <div>
+              <Label htmlFor="link2">Navigation Link 2</Label>
+              <Input
+                id="link2"
+                value={selectedBlock.content.link2 || ''}
+                onChange={(e) => updateContent('link2', e.target.value)}
+                placeholder="About"
+              />
+            </div>
+            <div>
+              <Label htmlFor="link3">Navigation Link 3</Label>
+              <Input
+                id="link3"
+                value={selectedBlock.content.link3 || ''}
+                onChange={(e) => updateContent('link3', e.target.value)}
+                placeholder="Services"
+              />
+            </div>
+            <div>
+              <Label htmlFor="link4">Navigation Link 4</Label>
+              <Input
+                id="link4"
+                value={selectedBlock.content.link4 || ''}
+                onChange={(e) => updateContent('link4', e.target.value)}
+                placeholder="Contact"
+              />
+            </div>
+            <div>
+              <Label htmlFor="ctaText">CTA Button Text</Label>
+              <Input
+                id="ctaText"
+                value={selectedBlock.content.ctaText || ''}
+                onChange={(e) => updateContent('ctaText', e.target.value)}
+                placeholder="Get Started"
+              />
+            </div>
+          </div>
+        );
+
+      case 'footer':
+        return (
+          <div className="space-y-4 max-h-80 overflow-y-auto">
+            {[1, 2, 3, 4].map(colNum => (
+              <div key={colNum} className="space-y-2 border-b border-gray-200 pb-4">
+                <Label>Column {colNum} Title</Label>
+                <Input
+                  value={selectedBlock.content[`col${colNum}Title`] || ''}
+                  onChange={(e) => updateContent(`col${colNum}Title`, e.target.value)}
+                  placeholder={['Company', 'Product', 'Support', 'Legal'][colNum - 1]}
+                />
+                {[1, 2, 3].map(linkNum => (
+                  <Input
+                    key={linkNum}
+                    value={selectedBlock.content[`col${colNum}Link${linkNum}`] || ''}
+                    onChange={(e) => updateContent(`col${colNum}Link${linkNum}`, e.target.value)}
+                    placeholder={`Link ${linkNum}`}
+                    className="text-sm"
+                  />
+                ))}
+              </div>
+            ))}
+            <div>
+              <Label htmlFor="copyright">Copyright Text</Label>
+              <Input
+                id="copyright"
+                value={selectedBlock.content.copyright || ''}
+                onChange={(e) => updateContent('copyright', e.target.value)}
+                placeholder="© 2024 Your Company. All rights reserved."
+              />
+            </div>
+          </div>
+        );
+
       case 'hero':
         return (
           <div className="space-y-4">
@@ -134,18 +228,31 @@ export const PropertiesPanel = ({ selectedBlock, onUpdateBlock }) => {
           </div>
         );
 
+      case 'contact':
+        return (
+          <div>
+            <Label htmlFor="contactTitle">Contact Title</Label>
+            <Input
+              id="contactTitle"
+              value={selectedBlock.content.title || ''}
+              onChange={(e) => updateContent('title', e.target.value)}
+              placeholder="Contact Us"
+            />
+          </div>
+        );
+
       default:
         return <p className="text-gray-500">No content options for this block type</p>;
     }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 h-full overflow-hidden">
       <Card>
         <CardHeader>
           <CardTitle className="text-sm">Content</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 max-h-80 overflow-y-auto">
           {renderContentEditor()}
         </CardContent>
       </Card>

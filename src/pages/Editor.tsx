@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
 import { 
   Type, 
   Image, 
@@ -13,7 +14,8 @@ import {
   Palette,
   Settings,
   Plus,
-  FileText
+  FileText,
+  Edit2
 } from "lucide-react";
 import { DragDropCanvas } from "@/components/editor/DragDropCanvas";
 import { BlockLibrary } from "@/components/editor/BlockLibrary";
@@ -25,6 +27,8 @@ const Editor = () => {
   const [selectedBlock, setSelectedBlock] = useState(null);
   const [canvasBlocks, setCanvasBlocks] = useState([]);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [projectName, setProjectName] = useState('Landing Page');
+  const [isEditingName, setIsEditingName] = useState(false);
   const [searchParams] = useSearchParams();
 
   // Load template if specified in URL
@@ -34,6 +38,7 @@ const Editor = () => {
       const template = templates.find(t => t.id === templateId);
       if (template) {
         setCanvasBlocks(template.blocks);
+        setProjectName(template.name);
         console.log(`Loaded template: ${template.name}`);
       }
     }
@@ -54,6 +59,7 @@ const Editor = () => {
     if (template) {
       setCanvasBlocks(template.blocks);
       setSelectedBlock(null);
+      setProjectName(template.name);
       console.log(`Template "${template.name}" loaded successfully`);
     }
   };
@@ -64,7 +70,7 @@ const Editor = () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'landing-page.html';
+    a.download = `${projectName.toLowerCase().replace(/\s+/g, '-')}.html`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -139,7 +145,7 @@ const Editor = () => {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Landing Page</title>
+  <title>${projectName}</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; }
@@ -159,6 +165,44 @@ const Editor = () => {
 
   const getDefaultContent = (type) => {
     switch (type) {
+      case 'navbar-logo':
+        return {
+          logoText: 'Brand',
+          link1: 'Home',
+          link2: 'About',
+          link3: 'Services',
+          link4: 'Contact',
+          ctaText: 'Get Started'
+        };
+      case 'navbar-text':
+        return {
+          brandText: 'Company',
+          link1: 'Home',
+          link2: 'About',
+          link3: 'Services',
+          link4: 'Contact',
+          ctaText: 'Get Started'
+        };
+      case 'footer':
+        return {
+          col1Title: 'Company',
+          col1Link1: 'About Us',
+          col1Link2: 'Careers',
+          col1Link3: 'Contact',
+          col2Title: 'Product',
+          col2Link1: 'Features',
+          col2Link2: 'Pricing',
+          col2Link3: 'Documentation',
+          col3Title: 'Support',
+          col3Link1: 'Help Center',
+          col3Link2: 'Community',
+          col3Link3: 'Status',
+          col4Title: 'Legal',
+          col4Link1: 'Privacy',
+          col4Link2: 'Terms',
+          col4Link3: 'Cookies',
+          copyright: '© 2024 Your Company. All rights reserved.'
+        };
       case 'hero':
         return {
           title: 'Your Amazing Headline',
@@ -190,13 +234,33 @@ const Editor = () => {
   };
 
   const getDefaultStyles = (type) => {
-    return {
+    const baseStyles = {
       backgroundColor: '#ffffff',
       padding: '2rem',
       textAlign: 'center',
       fontSize: '1rem',
       color: '#000000'
     };
+
+    switch (type) {
+      case 'navbar-logo':
+      case 'navbar-text':
+        return {
+          ...baseStyles,
+          padding: '1rem 2rem',
+          textAlign: 'left'
+        };
+      case 'footer':
+        return {
+          ...baseStyles,
+          backgroundColor: '#1f2937',
+          color: '#ffffff',
+          padding: '3rem 2rem',
+          textAlign: 'left'
+        };
+      default:
+        return baseStyles;
+    }
   };
 
   return (
@@ -227,18 +291,18 @@ const Editor = () => {
         </div>
 
         {/* Tabs */}
-        <Tabs defaultValue="blocks" className="flex-1 flex flex-col">
+        <Tabs defaultValue="blocks" className="flex-1 flex flex-col overflow-hidden">
           <TabsList className="grid w-full grid-cols-3 m-4">
             <TabsTrigger value="blocks">Blocks</TabsTrigger>
             <TabsTrigger value="templates">Templates</TabsTrigger>
             <TabsTrigger value="properties">Properties</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="blocks" className="flex-1 p-4 pt-0">
+          <TabsContent value="blocks" className="flex-1 p-4 pt-0 overflow-y-auto">
             <BlockLibrary onAddBlock={addBlockToCanvas} />
           </TabsContent>
 
-          <TabsContent value="templates" className="flex-1 p-4 pt-0">
+          <TabsContent value="templates" className="flex-1 p-4 pt-0 overflow-y-auto">
             <div className="space-y-3">
               <h3 className="font-medium text-sm text-gray-600 uppercase tracking-wide">
                 Templates
@@ -270,7 +334,7 @@ const Editor = () => {
             </div>
           </TabsContent>
           
-          <TabsContent value="properties" className="flex-1 p-4 pt-0">
+          <TabsContent value="properties" className="flex-1 p-4 pt-0 overflow-hidden">
             <PropertiesPanel 
               selectedBlock={selectedBlock}
               onUpdateBlock={(updatedBlock) => {
@@ -290,7 +354,24 @@ const Editor = () => {
         {/* Top Toolbar */}
         <div className="bg-white border-b border-gray-200 p-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <h1 className="font-semibold">Landing Page</h1>
+            {isEditingName ? (
+              <Input
+                value={projectName}
+                onChange={(e) => setProjectName(e.target.value)}
+                onBlur={() => setIsEditingName(false)}
+                onKeyDown={(e) => e.key === 'Enter' && setIsEditingName(false)}
+                className="font-semibold text-lg border-none p-0 h-auto focus:ring-0"
+                autoFocus
+              />
+            ) : (
+              <h1 
+                className="font-semibold cursor-pointer hover:bg-gray-100 px-2 py-1 rounded flex items-center gap-2"
+                onClick={() => setIsEditingName(true)}
+              >
+                {projectName}
+                <Edit2 className="w-4 h-4 text-gray-400" />
+              </h1>
+            )}
             <span className="text-sm text-gray-500">({canvasBlocks.length} blocks)</span>
           </div>
           <div className="flex gap-2">
@@ -313,6 +394,7 @@ const Editor = () => {
             selectedBlock={selectedBlock}
             isPreviewMode={isPreviewMode}
             onUpdateBlocks={setCanvasBlocks}
+            onAddBlock={addBlockToCanvas}
           />
         </div>
       </div>

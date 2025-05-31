@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,6 +28,227 @@ export const RenderableBlock = ({ block, isPreviewMode, onUpdateBlock }) => {
 
   const renderBlock = () => {
     switch (block.type) {
+      case 'navbar-logo':
+        return (
+          <div style={blockStyle} className="py-4">
+            <div className="max-w-6xl mx-auto flex items-center justify-between">
+              {isPreviewMode ? (
+                <>
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-blue-600 rounded"></div>
+                    <span className="font-bold text-xl">{block.content.logoText || 'Brand'}</span>
+                  </div>
+                  <nav className="hidden md:flex items-center gap-6">
+                    <a href="#" className="hover:opacity-80">{block.content.link1 || 'Home'}</a>
+                    <a href="#" className="hover:opacity-80">{block.content.link2 || 'About'}</a>
+                    <a href="#" className="hover:opacity-80">{block.content.link3 || 'Services'}</a>
+                    <a href="#" className="hover:opacity-80">{block.content.link4 || 'Contact'}</a>
+                  </nav>
+                  <Button size="sm">{block.content.ctaText || 'Get Started'}</Button>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-blue-600 rounded"></div>
+                    <input
+                      className="font-bold text-xl bg-transparent border border-dashed border-gray-300 hover:border-gray-400 focus:border-blue-500 focus:outline-none px-2 py-1 rounded"
+                      value={block.content.logoText || ''}
+                      onChange={(e) => updateContent('logoText', e.target.value)}
+                      placeholder="Brand"
+                      style={{ color: block.styles.color }}
+                    />
+                  </div>
+                  <div className="flex gap-4">
+                    <input
+                      className="bg-transparent border border-dashed border-gray-300 hover:border-gray-400 focus:border-blue-500 focus:outline-none px-2 py-1 rounded text-sm"
+                      value={block.content.link1 || ''}
+                      onChange={(e) => updateContent('link1', e.target.value)}
+                      placeholder="Home"
+                      style={{ color: block.styles.color }}
+                    />
+                    <input
+                      className="bg-transparent border border-dashed border-gray-300 hover:border-gray-400 focus:border-blue-500 focus:outline-none px-2 py-1 rounded text-sm"
+                      value={block.content.link2 || ''}
+                      onChange={(e) => updateContent('link2', e.target.value)}
+                      placeholder="About"
+                      style={{ color: block.styles.color }}
+                    />
+                    <input
+                      className="bg-transparent border border-dashed border-gray-300 hover:border-gray-400 focus:border-blue-500 focus:outline-none px-2 py-1 rounded text-sm"
+                      value={block.content.link3 || ''}
+                      onChange={(e) => updateContent('link3', e.target.value)}
+                      placeholder="Services"
+                      style={{ color: block.styles.color }}
+                    />
+                    <input
+                      className="bg-transparent border border-dashed border-gray-300 hover:border-gray-400 focus:border-blue-500 focus:outline-none px-2 py-1 rounded text-sm"
+                      value={block.content.link4 || ''}
+                      onChange={(e) => updateContent('link4', e.target.value)}
+                      placeholder="Contact"
+                      style={{ color: block.styles.color }}
+                    />
+                  </div>
+                  <input
+                    className="bg-blue-600 text-white px-4 py-2 rounded text-sm border border-dashed border-gray-300 hover:border-gray-400 focus:border-blue-500 focus:outline-none"
+                    value={block.content.ctaText || ''}
+                    onChange={(e) => updateContent('ctaText', e.target.value)}
+                    placeholder="Get Started"
+                  />
+                </>
+              )}
+            </div>
+          </div>
+        );
+
+      case 'navbar-text':
+        return (
+          <div style={blockStyle} className="py-4">
+            <div className="max-w-6xl mx-auto flex items-center justify-between">
+              {isPreviewMode ? (
+                <>
+                  <span className="font-bold text-xl">{block.content.brandText || 'Company'}</span>
+                  <nav className="hidden md:flex items-center gap-6">
+                    <a href="#" className="hover:opacity-80">{block.content.link1 || 'Home'}</a>
+                    <a href="#" className="hover:opacity-80">{block.content.link2 || 'About'}</a>
+                    <a href="#" className="hover:opacity-80">{block.content.link3 || 'Services'}</a>
+                    <a href="#" className="hover:opacity-80">{block.content.link4 || 'Contact'}</a>
+                  </nav>
+                  <Button size="sm">{block.content.ctaText || 'Get Started'}</Button>
+                </>
+              ) : (
+                <>
+                  <input
+                    className="font-bold text-xl bg-transparent border border-dashed border-gray-300 hover:border-gray-400 focus:border-blue-500 focus:outline-none px-2 py-1 rounded"
+                    value={block.content.brandText || ''}
+                    onChange={(e) => updateContent('brandText', e.target.value)}
+                    placeholder="Company"
+                    style={{ color: block.styles.color }}
+                  />
+                  <div className="flex gap-4">
+                    <input
+                      className="bg-transparent border border-dashed border-gray-300 hover:border-gray-400 focus:border-blue-500 focus:outline-none px-2 py-1 rounded text-sm"
+                      value={block.content.link1 || ''}
+                      onChange={(e) => updateContent('link1', e.target.value)}
+                      placeholder="Home"
+                      style={{ color: block.styles.color }}
+                    />
+                    <input
+                      className="bg-transparent border border-dashed border-gray-300 hover:border-gray-400 focus:border-blue-500 focus:outline-none px-2 py-1 rounded text-sm"
+                      value={block.content.link2 || ''}
+                      onChange={(e) => updateContent('link2', e.target.value)}
+                      placeholder="About"
+                      style={{ color: block.styles.color }}
+                    />
+                    <input
+                      className="bg-transparent border border-dashed border-gray-300 hover:border-gray-400 focus:border-blue-500 focus:outline-none px-2 py-1 rounded text-sm"
+                      value={block.content.link3 || ''}
+                      onChange={(e) => updateContent('link3', e.target.value)}
+                      placeholder="Services"
+                      style={{ color: block.styles.color }}
+                    />
+                    <input
+                      className="bg-transparent border border-dashed border-gray-300 hover:border-gray-400 focus:border-blue-500 focus:outline-none px-2 py-1 rounded text-sm"
+                      value={block.content.link4 || ''}
+                      onChange={(e) => updateContent('link4', e.target.value)}
+                      placeholder="Contact"
+                      style={{ color: block.styles.color }}
+                    />
+                  </div>
+                  <input
+                    className="bg-blue-600 text-white px-4 py-2 rounded text-sm border border-dashed border-gray-300 hover:border-gray-400 focus:border-blue-500 focus:outline-none"
+                    value={block.content.ctaText || ''}
+                    onChange={(e) => updateContent('ctaText', e.target.value)}
+                    placeholder="Get Started"
+                  />
+                </>
+              )}
+            </div>
+          </div>
+        );
+
+      case 'footer':
+        return (
+          <div style={blockStyle} className="py-8">
+            <div className="max-w-6xl mx-auto">
+              {isPreviewMode ? (
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                  <div>
+                    <h4 className="font-bold mb-4">{block.content.col1Title || 'Company'}</h4>
+                    <ul className="space-y-2 text-sm opacity-80">
+                      <li><a href="#" className="hover:opacity-100">{block.content.col1Link1 || 'About Us'}</a></li>
+                      <li><a href="#" className="hover:opacity-100">{block.content.col1Link2 || 'Careers'}</a></li>
+                      <li><a href="#" className="hover:opacity-100">{block.content.col1Link3 || 'Contact'}</a></li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4 className="font-bold mb-4">{block.content.col2Title || 'Product'}</h4>
+                    <ul className="space-y-2 text-sm opacity-80">
+                      <li><a href="#" className="hover:opacity-100">{block.content.col2Link1 || 'Features'}</a></li>
+                      <li><a href="#" className="hover:opacity-100">{block.content.col2Link2 || 'Pricing'}</a></li>
+                      <li><a href="#" className="hover:opacity-100">{block.content.col2Link3 || 'Documentation'}</a></li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4 className="font-bold mb-4">{block.content.col3Title || 'Support'}</h4>
+                    <ul className="space-y-2 text-sm opacity-80">
+                      <li><a href="#" className="hover:opacity-100">{block.content.col3Link1 || 'Help Center'}</a></li>
+                      <li><a href="#" className="hover:opacity-100">{block.content.col3Link2 || 'Community'}</a></li>
+                      <li><a href="#" className="hover:opacity-100">{block.content.col3Link3 || 'Status'}</a></li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4 className="font-bold mb-4">{block.content.col4Title || 'Legal'}</h4>
+                    <ul className="space-y-2 text-sm opacity-80">
+                      <li><a href="#" className="hover:opacity-100">{block.content.col4Link1 || 'Privacy'}</a></li>
+                      <li><a href="#" className="hover:opacity-100">{block.content.col4Link2 || 'Terms'}</a></li>
+                      <li><a href="#" className="hover:opacity-100">{block.content.col4Link3 || 'Cookies'}</a></li>
+                    </ul>
+                  </div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                  {[1, 2, 3, 4].map(colNum => (
+                    <div key={colNum}>
+                      <input
+                        className="font-bold mb-4 bg-transparent border border-dashed border-gray-300 hover:border-gray-400 focus:border-blue-500 focus:outline-none px-2 py-1 rounded w-full"
+                        value={block.content[`col${colNum}Title`] || ''}
+                        onChange={(e) => updateContent(`col${colNum}Title`, e.target.value)}
+                        placeholder={['Company', 'Product', 'Support', 'Legal'][colNum - 1]}
+                        style={{ color: block.styles.color }}
+                      />
+                      <div className="space-y-2">
+                        {[1, 2, 3].map(linkNum => (
+                          <input
+                            key={linkNum}
+                            className="block text-sm opacity-80 bg-transparent border border-dashed border-gray-300 hover:border-gray-400 focus:border-blue-500 focus:outline-none px-2 py-1 rounded w-full"
+                            value={block.content[`col${colNum}Link${linkNum}`] || ''}
+                            onChange={(e) => updateContent(`col${colNum}Link${linkNum}`, e.target.value)}
+                            placeholder={`Link ${linkNum}`}
+                            style={{ color: block.styles.color }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <div className="border-t border-gray-200 mt-8 pt-8 text-center text-sm opacity-60">
+                {isPreviewMode ? (
+                  <p>{block.content.copyright || '© 2024 Your Company. All rights reserved.'}</p>
+                ) : (
+                  <input
+                    className="bg-transparent border border-dashed border-gray-300 hover:border-gray-400 focus:border-blue-500 focus:outline-none px-2 py-1 rounded w-full text-center"
+                    value={block.content.copyright || ''}
+                    onChange={(e) => updateContent('copyright', e.target.value)}
+                    placeholder="© 2024 Your Company. All rights reserved."
+                    style={{ color: block.styles.color }}
+                  />
+                )}
+              </div>
+            </div>
+          </div>
+        );
+
       case 'hero':
         return (
           <div style={blockStyle} className="py-16">

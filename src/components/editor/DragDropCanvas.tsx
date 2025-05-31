@@ -10,7 +10,8 @@ export const DragDropCanvas = ({
   onSelectBlock, 
   selectedBlock, 
   isPreviewMode,
-  onUpdateBlocks 
+  onUpdateBlocks,
+  onAddBlock 
 }) => {
   const handleBlockClick = (block) => {
     if (!isPreviewMode) {
@@ -46,13 +47,30 @@ export const DragDropCanvas = ({
     onUpdateBlocks(newBlocks);
   };
 
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const blockType = e.dataTransfer.getData('text/plain');
+    if (blockType && onAddBlock) {
+      onAddBlock(blockType);
+    }
+  };
+
   if (blocks.length === 0) {
     return (
       <div className="max-w-4xl mx-auto">
-        <Card className="border-2 border-dashed border-gray-300 p-12 text-center">
+        <Card 
+          className="border-2 border-dashed border-gray-300 p-12 text-center hover:border-blue-400 transition-colors"
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
+        >
           <div className="text-gray-500">
             <h3 className="text-lg font-medium mb-2">Start Building Your Page</h3>
-            <p>Drag blocks from the sidebar to begin creating your landing page</p>
+            <p>Drag blocks from the sidebar or click to add them to your canvas</p>
           </div>
         </Card>
       </div>
@@ -60,7 +78,11 @@ export const DragDropCanvas = ({
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-4">
+    <div 
+      className="max-w-4xl mx-auto space-y-4"
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+    >
       {blocks.map((block, index) => (
         <div key={block.id} className="relative group">
           <div
@@ -82,7 +104,7 @@ export const DragDropCanvas = ({
 
           {/* Block Controls */}
           {!isPreviewMode && selectedBlock?.id === block.id && (
-            <div className="absolute top-2 right-2 flex gap-1 bg-white rounded-md shadow-md border p-1">
+            <div className="absolute top-2 right-2 flex gap-1 bg-white rounded-md shadow-md border p-1 z-10">
               <Button
                 size="sm"
                 variant="ghost"

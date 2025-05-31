@@ -8,7 +8,9 @@ import {
   Square, 
   Mail, 
   Star,
-  Plus
+  Plus,
+  Navigation,
+  AlignJustify
 } from "lucide-react";
 
 const blockTypes = [
@@ -17,6 +19,18 @@ const blockTypes = [
     name: 'Hero Section',
     icon: Star,
     description: 'Eye-catching header with title and CTA'
+  },
+  {
+    id: 'navbar-logo',
+    name: 'Navbar with Logo',
+    icon: Navigation,
+    description: 'Navigation bar with logo and links'
+  },
+  {
+    id: 'navbar-text',
+    name: 'Navbar Text Only',
+    icon: AlignJustify,
+    description: 'Simple navigation with text links'
   },
   {
     id: 'text',
@@ -41,10 +55,21 @@ const blockTypes = [
     name: 'Contact Form',
     icon: Mail,
     description: 'Contact form with fields'
+  },
+  {
+    id: 'footer',
+    name: 'Footer',
+    icon: AlignJustify,
+    description: 'Footer section with links and info'
   }
 ];
 
 export const BlockLibrary = ({ onAddBlock }) => {
+  const handleDragStart = (e, blockType) => {
+    e.dataTransfer.setData('text/plain', blockType);
+    e.dataTransfer.effectAllowed = 'copy';
+  };
+
   return (
     <div className="space-y-3">
       <h3 className="font-medium text-sm text-gray-600 uppercase tracking-wide">
@@ -58,6 +83,8 @@ export const BlockLibrary = ({ onAddBlock }) => {
           <Card 
             key={blockType.id} 
             className="cursor-pointer hover:shadow-md transition-shadow"
+            draggable
+            onDragStart={(e) => handleDragStart(e, blockType.id)}
             onClick={() => onAddBlock(blockType.id)}
           >
             <CardContent className="p-3">
