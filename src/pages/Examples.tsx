@@ -7,52 +7,58 @@ import { Link } from "react-router-dom";
 
 const exampleTemplates = [
   {
-    id: 1,
+    id: 'saas-startup',
     name: "SaaS Startup",
     description: "Perfect for software companies and tech startups",
-    image: "/placeholder.svg",
-    features: ["Hero section", "Feature highlights", "Pricing table", "Contact form"],
-    preview: "https://example.com/saas-preview"
+    image: "https://images.unsplash.com/photo-1551434678-e076c223a692?w=400&h=250&fit=crop",
+    features: ["Hero section with CTA", "Feature highlights", "Product showcase", "Contact form"],
+    preview: "/editor?template=saas-startup&preview=true",
+    use: "/editor?template=saas-startup"
   },
   {
-    id: 2,
+    id: 'agency-portfolio',
     name: "Agency Portfolio",
     description: "Showcase your creative work and services",
-    image: "/placeholder.svg",
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=250&fit=crop",
     features: ["Portfolio gallery", "Team section", "Service overview", "Testimonials"],
-    preview: "https://example.com/agency-preview"
+    preview: "#",
+    use: "/editor"
   },
   {
-    id: 3,
+    id: 'product-launch',
     name: "Product Launch",
     description: "Launch your product with style and conversion focus",
-    image: "/placeholder.svg",
+    image: "https://images.unsplash.com/photo-1551650975-87deedd944c3?w=400&h=250&fit=crop",
     features: ["Product showcase", "Benefits list", "Social proof", "Pre-order form"],
-    preview: "https://example.com/product-preview"
+    preview: "#",
+    use: "/editor"
   },
   {
-    id: 4,
+    id: 'event-landing',
     name: "Event Landing",
     description: "Drive registrations for your next event",
-    image: "/placeholder.svg",
+    image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&h=250&fit=crop",
     features: ["Event details", "Speaker lineup", "Schedule", "Registration form"],
-    preview: "https://example.com/event-preview"
+    preview: "#",
+    use: "/editor"
   },
   {
-    id: 5,
+    id: 'course-sales',
     name: "Course Sales",
     description: "Sell online courses and digital products",
-    image: "/placeholder.svg",
+    image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=250&fit=crop",
     features: ["Course overview", "Curriculum", "Instructor bio", "Enrollment form"],
-    preview: "https://example.com/course-preview"
+    preview: "#",
+    use: "/editor"
   },
   {
-    id: 6,
+    id: 'local-business',
     name: "Local Business",
     description: "Perfect for restaurants, shops, and local services",
-    image: "/placeholder.svg",
+    image: "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=400&h=250&fit=crop",
     features: ["Location info", "Services", "Hours", "Contact details"],
-    preview: "https://example.com/local-preview"
+    preview: "#",
+    use: "/editor"
   }
 ];
 
@@ -98,11 +104,11 @@ const Examples = () => {
           {exampleTemplates.map((template) => (
             <Card key={template.id} className="hover:shadow-lg transition-shadow duration-300">
               <CardHeader className="p-0">
-                <div className="aspect-video bg-gradient-to-br from-blue-100 to-purple-100 rounded-t-lg flex items-center justify-center">
+                <div className="aspect-video rounded-t-lg overflow-hidden">
                   <img
                     src={template.image}
                     alt={template.name}
-                    className="w-full h-full object-cover rounded-t-lg"
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                   />
                 </div>
               </CardHeader>
@@ -125,14 +131,18 @@ const Examples = () => {
                 </div>
 
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm" className="flex-1">
-                    <Eye className="w-4 h-4 mr-1" />
-                    Preview
-                  </Button>
-                  <Button size="sm" className="flex-1">
-                    <Copy className="w-4 h-4 mr-1" />
-                    Use Template
-                  </Button>
+                  <Link to={template.preview} className="flex-1">
+                    <Button variant="outline" size="sm" className="w-full">
+                      <Eye className="w-4 h-4 mr-1" />
+                      Preview
+                    </Button>
+                  </Link>
+                  <Link to={template.use} className="flex-1">
+                    <Button size="sm" className="w-full">
+                      <Copy className="w-4 h-4 mr-1" />
+                      Use Template
+                    </Button>
+                  </Link>
                 </div>
               </CardContent>
             </Card>
@@ -154,9 +164,11 @@ const Examples = () => {
                   Start Building Now
                 </Button>
               </Link>
-              <Button variant="outline" size="lg" className="text-lg px-8 py-6">
-                Browse More Templates
-              </Button>
+              <Link to="/editor?template=saas-startup">
+                <Button variant="outline" size="lg" className="text-lg px-8 py-6">
+                  Try SaaS Template
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
