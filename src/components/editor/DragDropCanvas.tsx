@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Trash2, Move } from "lucide-react";
+import { Trash2, MoveUp, MoveDown } from "lucide-react";
 import { RenderableBlock } from "./RenderableBlock";
 
 export const DragDropCanvas = ({ 
@@ -16,6 +16,12 @@ export const DragDropCanvas = ({
     if (!isPreviewMode) {
       onSelectBlock(block);
     }
+  };
+
+  const updateBlock = (updatedBlock) => {
+    onUpdateBlocks(blocks.map(block => 
+      block.id === updatedBlock.id ? updatedBlock : block
+    ));
   };
 
   const deleteBlock = (blockId) => {
@@ -67,7 +73,11 @@ export const DragDropCanvas = ({
             `}
             onClick={() => handleBlockClick(block)}
           >
-            <RenderableBlock block={block} isPreviewMode={isPreviewMode} />
+            <RenderableBlock 
+              block={block} 
+              isPreviewMode={isPreviewMode} 
+              onUpdateBlock={updateBlock}
+            />
           </div>
 
           {/* Block Controls */}
@@ -82,8 +92,22 @@ export const DragDropCanvas = ({
                 }}
                 disabled={index === 0}
                 className="h-6 w-6 p-0"
+                title="Move up"
               >
-                <Move className="w-3 h-3" />
+                <MoveUp className="w-3 h-3" />
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  moveBlock(block.id, 'down');
+                }}
+                disabled={index === blocks.length - 1}
+                className="h-6 w-6 p-0"
+                title="Move down"
+              >
+                <MoveDown className="w-3 h-3" />
               </Button>
               <Button
                 size="sm"
@@ -93,6 +117,7 @@ export const DragDropCanvas = ({
                   deleteBlock(block.id);
                 }}
                 className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
+                title="Delete block"
               >
                 <Trash2 className="w-3 h-3" />
               </Button>
