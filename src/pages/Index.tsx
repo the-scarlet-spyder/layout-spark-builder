@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, Zap, Palette, Code, Globe, Smartphone, Users } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Index = () => {
   return (
@@ -17,7 +18,9 @@ const Index = () => {
           </div>
           <div className="flex items-center space-x-4">
             <Button variant="ghost">Sign In</Button>
-            <Button>Get Started</Button>
+            <Link to="/editor">
+              <Button>Get Started</Button>
+            </Link>
           </div>
         </nav>
       </header>
@@ -35,13 +38,17 @@ const Index = () => {
             No coding required. Just drag, customize, and publish.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button size="lg" className="text-lg px-8 py-6">
-              Start Building Free
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
-            <Button variant="outline" size="lg" className="text-lg px-8 py-6">
-              View Examples
-            </Button>
+            <Link to="/editor">
+              <Button size="lg" className="text-lg px-8 py-6">
+                Start Building Free
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            </Link>
+            <Link to="/examples">
+              <Button variant="outline" size="lg" className="text-lg px-8 py-6">
+                View Examples
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
@@ -154,10 +161,12 @@ const Index = () => {
             Join thousands of creators who trust PageCraft to build beautiful, 
             high-converting landing pages.
           </p>
-          <Button size="lg" variant="secondary" className="text-lg px-8 py-6">
-            Start Building Now - It's Free
-            <ArrowRight className="w-5 h-5 ml-2" />
-          </Button>
+          <Link to="/editor">
+            <Button size="lg" variant="secondary" className="text-lg px-8 py-6">
+              Start Building Now - It's Free
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </Button>
+          </Link>
         </div>
       </section>
 
