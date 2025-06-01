@@ -1,6 +1,6 @@
 
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Float, Text3D, Center } from '@react-three/drei';
+import { OrbitControls, Float } from '@react-three/drei';
 import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -25,24 +25,23 @@ function FloatingCube({ position, color }: { position: [number, number, number];
   );
 }
 
-function GridText() {
+function FloatingSphere({ position, color }: { position: [number, number, number]; color: string }) {
+  const meshRef = useRef<THREE.Mesh>(null);
+  
+  useFrame((state) => {
+    if (meshRef.current) {
+      meshRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.7) * 0.2;
+      meshRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.3) * 0.4;
+    }
+  });
+
   return (
-    <Center>
-      <Text3D
-        font="/fonts/helvetiker_regular.typeface.json"
-        size={0.8}
-        height={0.1}
-        curveSegments={12}
-        bevelEnabled
-        bevelThickness={0.02}
-        bevelSize={0.02}
-        bevelOffset={0}
-        bevelSegments={5}
-      >
-        GRID
-        <meshStandardMaterial color="#a855f7" />
-      </Text3D>
-    </Center>
+    <Float speed={2} rotationIntensity={0.5} floatIntensity={1.5}>
+      <mesh ref={meshRef} position={position}>
+        <sphereGeometry args={[0.8, 32, 32]} />
+        <meshStandardMaterial color={color} />
+      </mesh>
+    </Float>
   );
 }
 
@@ -56,9 +55,9 @@ export default function HeroScene() {
         
         <FloatingCube position={[-3, 1, 0]} color="#8b5cf6" />
         <FloatingCube position={[3, -1, 0]} color="#a855f7" />
-        <FloatingCube position={[0, 2, -2]} color="#7c3aed" />
-        
-        <GridText />
+        <FloatingSphere position={[0, 2, -2]} color="#7c3aed" />
+        <FloatingCube position={[1, -2, 1]} color="#6366f1" />
+        <FloatingSphere position={[-2, -1, 1]} color="#8b5cf6" />
         
         <OrbitControls enableZoom={false} enablePan={false} />
       </Canvas>
