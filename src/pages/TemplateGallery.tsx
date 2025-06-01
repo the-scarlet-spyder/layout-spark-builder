@@ -36,7 +36,18 @@ export default function TemplateGallery() {
         .order('is_featured', { ascending: false });
 
       if (error) throw error;
-      setTemplates(data || []);
+      
+      // Convert Supabase data to our Template interface
+      const templatesData: Template[] = (data || []).map(template => ({
+        id: template.id,
+        name: template.name,
+        description: template.description,
+        category: template.category,
+        blocks: Array.isArray(template.blocks) ? template.blocks : [],
+        is_featured: template.is_featured || false
+      }));
+      
+      setTemplates(templatesData);
     } catch (error) {
       console.error('Failed to fetch templates:', error);
     } finally {

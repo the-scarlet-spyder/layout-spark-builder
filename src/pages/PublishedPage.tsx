@@ -32,7 +32,17 @@ export default function PublishedPage() {
         .single();
 
       if (error) throw error;
-      setProject(data);
+      
+      // Convert Supabase data to our Project interface
+      const projectData: Project = {
+        id: data.id,
+        name: data.name,
+        slug: data.slug,
+        blocks: Array.isArray(data.blocks) ? data.blocks : [],
+        user_id: data.user_id
+      };
+      
+      setProject(projectData);
     } catch (error) {
       console.error('Failed to fetch published project:', error);
       setError(true);
@@ -67,11 +77,8 @@ export default function PublishedPage() {
         <RenderableBlock
           key={block.id}
           block={block}
-          isSelected={false}
           isPreviewMode={true}
-          onSelect={() => {}}
-          onUpdate={() => {}}
-          onDelete={() => {}}
+          onUpdateBlock={() => {}}
         />
       ))}
     </div>

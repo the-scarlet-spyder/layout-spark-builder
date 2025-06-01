@@ -20,6 +20,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
+import { Json } from '@/integrations/supabase/types';
 
 interface Project {
   id: string;
@@ -27,6 +28,14 @@ interface Project {
   slug: string;
   blocks: any[];
   is_published: boolean;
+}
+
+interface Template {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  blocks: any[];
 }
 
 export default function EditorWithProject() {
@@ -42,7 +51,7 @@ export default function EditorWithProject() {
   const [canvasBlocks, setCanvasBlocks] = useState([]);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
-  const [templates, setTemplates] = useState([]);
+  const [templates, setTemplates] = useState<Template[]>([]);
 
   useEffect(() => {
     if (projectId) {
@@ -61,8 +70,17 @@ export default function EditorWithProject() {
 
       if (error) throw error;
       
-      setProject(data);
-      setCanvasBlocks(data.blocks || []);
+      // Convert Supabase data to our Project interface
+      const projectData: Project = {
+        id: data.id,
+        name: data.name,
+        slug: data.slug,
+        blocks: Array.isArray(data.blocks) ? data.blocks : [],
+        is_published: data.is_published || false
+      };
+      
+      setProject(projectData);
+      setCanvasBlocks(projectData.blocks);
     } catch (error) {
       toast({
         title: "Error",
@@ -83,7 +101,17 @@ export default function EditorWithProject() {
         .order('name');
 
       if (error) throw error;
-      setTemplates(data || []);
+      
+      // Convert Supabase data to our Template interface
+      const templatesData: Template[] = (data || []).map(template => ({
+        id: template.id,
+        name: template.name,
+        description: template.description,
+        category: template.category,
+        blocks: Array.isArray(template.blocks) ? template.blocks : []
+      }));
+      
+      setTemplates(templatesData);
     } catch (error) {
       console.error('Failed to fetch templates:', error);
     }
