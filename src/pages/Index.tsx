@@ -3,8 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, Zap, Palette, Code, Globe, Smartphone, Users } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
+  const { user } = useAuth();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {/* Header */}
@@ -17,10 +20,18 @@ const Index = () => {
             <span className="text-xl font-bold text-gray-900">PageCraft</span>
           </div>
           <div className="flex items-center space-x-4">
-            <Button variant="ghost">Sign In</Button>
-            <Link to="/editor">
-              <Button>Get Started</Button>
+            <Link to="/templates">
+              <Button variant="ghost">Templates</Button>
             </Link>
+            {user ? (
+              <Link to="/dashboard">
+                <Button>Dashboard</Button>
+              </Link>
+            ) : (
+              <Link to="/auth">
+                <Button>Sign In</Button>
+              </Link>
+            )}
           </div>
         </nav>
       </header>
@@ -38,15 +49,24 @@ const Index = () => {
             No coding required. Just drag, customize, and publish.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link to="/editor">
-              <Button size="lg" className="text-lg px-8 py-6">
-                Start Building Free
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-            </Link>
-            <Link to="/examples">
+            {user ? (
+              <Link to="/dashboard">
+                <Button size="lg" className="text-lg px-8 py-6">
+                  Go to Dashboard
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </Link>
+            ) : (
+              <Link to="/auth">
+                <Button size="lg" className="text-lg px-8 py-6">
+                  Start Building Free
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </Link>
+            )}
+            <Link to="/templates">
               <Button variant="outline" size="lg" className="text-lg px-8 py-6">
-                View Examples
+                Browse Templates
               </Button>
             </Link>
           </div>
@@ -140,11 +160,11 @@ const Index = () => {
               <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
                 <Users className="w-6 h-6 text-indigo-600" />
               </div>
-              <CardTitle className="text-xl">Team Collaboration</CardTitle>
+              <CardTitle className="text-xl">Project Management</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-gray-600">
-                Manage multiple projects, save templates, and collaborate with your team all in one place.
+                Manage multiple projects, save templates, and organize all your landing pages in one place.
               </p>
             </CardContent>
           </Card>
@@ -161,12 +181,21 @@ const Index = () => {
             Join thousands of creators who trust PageCraft to build beautiful, 
             high-converting landing pages.
           </p>
-          <Link to="/editor">
-            <Button size="lg" variant="secondary" className="text-lg px-8 py-6">
-              Start Building Now - It's Free
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
-          </Link>
+          {user ? (
+            <Link to="/dashboard">
+              <Button size="lg" variant="secondary" className="text-lg px-8 py-6">
+                Go to Dashboard
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            </Link>
+          ) : (
+            <Link to="/auth">
+              <Button size="lg" variant="secondary" className="text-lg px-8 py-6">
+                Start Building Now - It's Free
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            </Link>
+          )}
         </div>
       </section>
 
