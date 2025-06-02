@@ -96,7 +96,7 @@ export const FigmaCanvasController: React.FC<FigmaCanvasControllerProps> = ({
     setElements(newElements);
     setSelectedElements([newElement.id]);
     onElementsChange?.(newElements);
-    onSelectionChange?.(newElement.id);
+    onSelectionChange?.([newElement.id]); // Fixed: pass array instead of string
   }, [elements, onElementsChange, onSelectionChange]);
 
   const getDefaultContent = (type: CanvasElementData['type']) => {
