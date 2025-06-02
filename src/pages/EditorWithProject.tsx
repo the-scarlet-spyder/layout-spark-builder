@@ -11,11 +11,15 @@ import {
   FileText,
   Edit2,
   Globe,
-  ArrowLeft
+  ArrowLeft,
+  Palette
 } from "lucide-react";
 import { DragDropCanvas } from "@/components/editor/DragDropCanvas";
 import { BlockLibrary } from "@/components/editor/BlockLibrary";
 import { PropertiesPanel } from "@/components/editor/PropertiesPanel";
+import { AdvancedStylePanel } from "@/components/editor/AdvancedStylePanel";
+import { ResponsiveControls } from "@/components/editor/ResponsiveControls";
+import { PublishingPanel } from "@/components/editor/PublishingPanel";
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from "@/hooks/use-toast";
@@ -28,6 +32,7 @@ interface Project {
   slug: string;
   blocks: any[];
   is_published: boolean;
+  published_url?: string;
 }
 
 interface Template {
@@ -52,6 +57,19 @@ export default function EditorWithProject() {
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
   const [templates, setTemplates] = useState<Template[]>([]);
+  const [currentViewport, setCurrentViewport] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
+  const [useAdvancedStyles, setUseAdvancedStyles] = useState(false);
+
+  // Auto-save functionality
+  useEffect(() => {
+    const autoSaveInterval = setInterval(() => {
+      if (project && canvasBlocks.length > 0) {
+        saveProject(true); // Silent save
+      }
+    }, 30000); // Auto-save every 30 seconds
+
+    return () => clearInterval(autoSaveInterval);
+  }, [project, canvasBlocks]);
 
   useEffect(() => {
     if (projectId) {
@@ -76,7 +94,8 @@ export default function EditorWithProject() {
         name: data.name,
         slug: data.slug,
         blocks: Array.isArray(data.blocks) ? data.blocks : [],
-        is_published: data.is_published || false
+        is_published: data.is_published || false,
+        published_url: data.published_url || undefined
       };
       
       setProject(projectData);
@@ -117,7 +136,7 @@ export default function EditorWithProject() {
     }
   };
 
-  const saveProject = async () => {
+  const saveProject = async (silent = false) => {
     if (!project) return;
     
     setSaving(true);
@@ -133,16 +152,20 @@ export default function EditorWithProject() {
 
       if (error) throw error;
 
-      toast({
-        title: "Success",
-        description: "Project saved successfully",
-      });
+      if (!silent) {
+        toast({
+          title: "Success",
+          description: "Project saved successfully",
+        });
+      }
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to save project",
-        variant: "destructive",
-      });
+      if (!silent) {
+        toast({
+          title: "Error",
+          description: "Failed to save project",
+          variant: "destructive",
+        });
+      }
     } finally {
       setSaving(false);
     }
@@ -296,6 +319,14 @@ export default function EditorWithProject() {
     }
   };
 
+  const getCanvasWidth = () => {
+    switch (currentViewport) {
+      case 'mobile': return 'max-w-sm';
+      case 'tablet': return 'max-w-2xl';
+      default: return 'max-w-4xl';
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -343,10 +374,11 @@ export default function EditorWithProject() {
 
         {/* Tabs */}
         <Tabs defaultValue="blocks" className="flex-1 flex flex-col overflow-hidden">
-          <TabsList className="grid w-full grid-cols-3 m-4">
+          <TabsList className="grid w-full grid-cols-4 m-4">
             <TabsTrigger value="blocks">Blocks</TabsTrigger>
             <TabsTrigger value="templates">Templates</TabsTrigger>
             <TabsTrigger value="properties">Properties</TabsTrigger>
+            <TabsTrigger value="publish">Publish</TabsTrigger>
           </TabsList>
           
           <TabsContent value="blocks" className="flex-1 p-4 pt-0 overflow-y-auto">
@@ -381,16 +413,48 @@ export default function EditorWithProject() {
           </TabsContent>
           
           <TabsContent value="properties" className="flex-1 p-4 pt-0 overflow-hidden">
-            <PropertiesPanel 
-              selectedBlock={selectedBlock}
-              onUpdateBlock={(updatedBlock) => {
-                setCanvasBlocks(blocks => 
-                  blocks.map(block => 
-                    block.id === updatedBlock.id ? updatedBlock : block
-                  )
-                );
-              }}
-            />
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="font-medium text-sm">Properties Panel</h3>
+                <Button
+                  variant={useAdvancedStyles ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setUseAdvancedStyles(!useAdvancedStyles)}
+                >
+                  <Palette className="w-4 h-4 mr-1" />
+                  {useAdvancedStyles ? 'Basic' : 'Advanced'}
+                </Button>
+              </div>
+              
+              {useAdvancedStyles ? (
+                <AdvancedStylePanel 
+                  selectedBlock={selectedBlock}
+                  currentViewport={currentViewport}
+                  onUpdateBlock={(updatedBlock) => {
+                    setCanvasBlocks(blocks => 
+                      blocks.map(block => 
+                        block.id === updatedBlock.id ? updatedBlock : block
+                      )
+                    );
+                  }}
+                />
+              ) : (
+                <PropertiesPanel 
+                  selectedBlock={selectedBlock}
+                  onUpdateBlock={(updatedBlock) => {
+                    setCanvasBlocks(blocks => 
+                      blocks.map(block => 
+                        block.id === updatedBlock.id ? updatedBlock : block
+                      )
+                    );
+                  }}
+                />
+              )}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="publish" className="flex-1 p-4 pt-0 overflow-y-auto">
+            <PublishingPanel project={project} blocks={canvasBlocks} />
           </TabsContent>
         </Tabs>
       </div>
@@ -399,29 +463,37 @@ export default function EditorWithProject() {
       <div className="flex-1 flex flex-col">
         {/* Top Toolbar */}
         <div className="bg-white border-b border-gray-200 p-4 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            {isEditingName ? (
-              <Input
-                value={project.name}
-                onChange={(e) => setProject({ ...project, name: e.target.value })}
-                onBlur={() => setIsEditingName(false)}
-                onKeyDown={(e) => e.key === 'Enter' && setIsEditingName(false)}
-                className="font-semibold text-lg border-none p-0 h-auto focus:ring-0"
-                autoFocus
-              />
-            ) : (
-              <h1 
-                className="font-semibold cursor-pointer hover:bg-gray-100 px-2 py-1 rounded flex items-center gap-2"
-                onClick={() => setIsEditingName(true)}
-              >
-                {project.name}
-                <Edit2 className="w-4 h-4 text-gray-400" />
-              </h1>
-            )}
-            <span className="text-sm text-gray-500">({canvasBlocks.length} blocks)</span>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              {isEditingName ? (
+                <Input
+                  value={project.name}
+                  onChange={(e) => setProject({ ...project, name: e.target.value })}
+                  onBlur={() => setIsEditingName(false)}
+                  onKeyDown={(e) => e.key === 'Enter' && setIsEditingName(false)}
+                  className="font-semibold text-lg border-none p-0 h-auto focus:ring-0"
+                  autoFocus
+                />
+              ) : (
+                <h1 
+                  className="font-semibold cursor-pointer hover:bg-gray-100 px-2 py-1 rounded flex items-center gap-2"
+                  onClick={() => setIsEditingName(true)}
+                >
+                  {project.name}
+                  <Edit2 className="w-4 h-4 text-gray-400" />
+                </h1>
+              )}
+              <span className="text-sm text-gray-500">({canvasBlocks.length} blocks)</span>
+            </div>
+            
+            <ResponsiveControls
+              currentViewport={currentViewport}
+              onViewportChange={setCurrentViewport}
+            />
           </div>
+          
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={saveProject} disabled={saving}>
+            <Button variant="outline" size="sm" onClick={() => saveProject()} disabled={saving}>
               <Save className="w-4 h-4 mr-1" />
               {saving ? 'Saving...' : 'Save'}
             </Button>
@@ -438,14 +510,16 @@ export default function EditorWithProject() {
 
         {/* Canvas */}
         <div className="flex-1 overflow-auto p-8">
-          <DragDropCanvas 
-            blocks={canvasBlocks}
-            onSelectBlock={setSelectedBlock}
-            selectedBlock={selectedBlock}
-            isPreviewMode={isPreviewMode}
-            onUpdateBlocks={setCanvasBlocks}
-            onAddBlock={addBlockToCanvas}
-          />
+          <div className={`mx-auto transition-all duration-300 ${getCanvasWidth()}`}>
+            <DragDropCanvas 
+              blocks={canvasBlocks}
+              onSelectBlock={setSelectedBlock}
+              selectedBlock={selectedBlock}
+              isPreviewMode={isPreviewMode}
+              onUpdateBlocks={setCanvasBlocks}
+              onAddBlock={addBlockToCanvas}
+            />
+          </div>
         </div>
       </div>
     </div>

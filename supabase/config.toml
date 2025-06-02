@@ -1,1 +1,5 @@
+
 project_id = "oziscamwpncynbxmalfa"
+
+[functions.generate-static-site]
+verify_jwt = true
