@@ -1,29 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Save, 
-  Eye,
-  Settings,
-  Plus,
-  FileText,
-  Edit2,
-  Globe,
-  ArrowLeft,
-  Palette
-} from "lucide-react";
-import { DragDropCanvas } from "@/components/editor/DragDropCanvas";
-import { BlockLibrary } from "@/components/editor/BlockLibrary";
-import { PropertiesPanel } from "@/components/editor/PropertiesPanel";
-import { AdvancedStylePanel } from "@/components/editor/AdvancedStylePanel";
-import { ResponsiveControls } from "@/components/editor/ResponsiveControls";
-import { PublishingPanel } from "@/components/editor/PublishingPanel";
+import { ModernSidebar } from "@/components/editor/ModernSidebar";
+import { ModernTopBar } from "@/components/editor/ModernTopBar";
+import { ModernCanvas } from "@/components/editor/ModernCanvas";
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from "@/hooks/use-toast";
-import { Link } from "react-router-dom";
 import { Json } from '@/integrations/supabase/types';
 
 interface Project {
@@ -329,198 +311,73 @@ export default function EditorWithProject() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-[#1E1E2E] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#8A2BE2]"></div>
       </div>
     );
   }
 
   if (!project) {
-    return <div>Project not found</div>;
+    return (
+      <div className="min-h-screen bg-[#1E1E2E] flex items-center justify-center">
+        <div className="text-white text-center">
+          <h2 className="text-2xl font-bold mb-2">Project not found</h2>
+          <p className="text-gray-400">The project you're looking for doesn't exist.</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="h-screen flex bg-gray-50">
-      {/* Sidebar */}
-      <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
-        {/* Header */}
-        <div className="p-4 border-b border-gray-200">
-          <Link to="/dashboard">
-            <Button variant="ghost" size="sm" className="mb-3">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Dashboard
-            </Button>
-          </Link>
-          <h2 className="font-semibold text-lg">Page Builder</h2>
-          <div className="flex gap-2 mt-3">
-            <Button 
-              variant={isPreviewMode ? "outline" : "default"} 
-              size="sm"
-              onClick={() => setIsPreviewMode(false)}
-            >
-              <Settings className="w-4 h-4 mr-1" />
-              Edit
-            </Button>
-            <Button 
-              variant={isPreviewMode ? "default" : "outline"} 
-              size="sm"
-              onClick={() => setIsPreviewMode(true)}
-            >
-              <Eye className="w-4 h-4 mr-1" />
-              Preview
-            </Button>
-          </div>
-        </div>
+    <div className="h-screen flex flex-col bg-[#141419] text-white">
+      {/* Top Navigation */}
+      <ModernTopBar
+        project={project}
+        isEditingName={isEditingName}
+        onToggleEditName={() => setIsEditingName(!isEditingName)}
+        onProjectNameChange={(name) => setProject({ ...project, name })}
+        canvasBlocks={canvasBlocks}
+        currentViewport={currentViewport}
+        onViewportChange={setCurrentViewport}
+        isPreviewMode={isPreviewMode}
+        onTogglePreview={() => setIsPreviewMode(!isPreviewMode)}
+        saving={saving}
+        onSave={() => saveProject()}
+        onPublish={publishProject}
+      />
 
-        {/* Tabs */}
-        <Tabs defaultValue="blocks" className="flex-1 flex flex-col overflow-hidden">
-          <TabsList className="grid w-full grid-cols-4 m-4">
-            <TabsTrigger value="blocks">Blocks</TabsTrigger>
-            <TabsTrigger value="templates">Templates</TabsTrigger>
-            <TabsTrigger value="properties">Properties</TabsTrigger>
-            <TabsTrigger value="publish">Publish</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="blocks" className="flex-1 p-4 pt-0 overflow-y-auto">
-            <BlockLibrary onAddBlock={addBlockToCanvas} />
-          </TabsContent>
-
-          <TabsContent value="templates" className="flex-1 p-4 pt-0 overflow-y-auto">
-            <div className="space-y-3">
-              <h3 className="font-medium text-sm text-gray-600 uppercase tracking-wide">
-                Templates
-              </h3>
-              {templates.map((template) => (
-                <div 
-                  key={template.id} 
-                  className="cursor-pointer hover:shadow-md transition-shadow p-3 border rounded-lg"
-                  onClick={() => loadTemplate(template.id)}
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <FileText className="w-4 h-4 text-purple-600" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-sm">{template.name}</h4>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {template.description}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="properties" className="flex-1 p-4 pt-0 overflow-hidden">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="font-medium text-sm">Properties Panel</h3>
-                <Button
-                  variant={useAdvancedStyles ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setUseAdvancedStyles(!useAdvancedStyles)}
-                >
-                  <Palette className="w-4 h-4 mr-1" />
-                  {useAdvancedStyles ? 'Basic' : 'Advanced'}
-                </Button>
-              </div>
-              
-              {useAdvancedStyles ? (
-                <AdvancedStylePanel 
-                  selectedBlock={selectedBlock}
-                  currentViewport={currentViewport}
-                  onUpdateBlock={(updatedBlock) => {
-                    setCanvasBlocks(blocks => 
-                      blocks.map(block => 
-                        block.id === updatedBlock.id ? updatedBlock : block
-                      )
-                    );
-                  }}
-                />
-              ) : (
-                <PropertiesPanel 
-                  selectedBlock={selectedBlock}
-                  onUpdateBlock={(updatedBlock) => {
-                    setCanvasBlocks(blocks => 
-                      blocks.map(block => 
-                        block.id === updatedBlock.id ? updatedBlock : block
-                      )
-                    );
-                  }}
-                />
-              )}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="publish" className="flex-1 p-4 pt-0 overflow-y-auto">
-            <PublishingPanel project={project} blocks={canvasBlocks} />
-          </TabsContent>
-        </Tabs>
-      </div>
-
-      {/* Main Canvas Area */}
-      <div className="flex-1 flex flex-col">
-        {/* Top Toolbar */}
-        <div className="bg-white border-b border-gray-200 p-4 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              {isEditingName ? (
-                <Input
-                  value={project.name}
-                  onChange={(e) => setProject({ ...project, name: e.target.value })}
-                  onBlur={() => setIsEditingName(false)}
-                  onKeyDown={(e) => e.key === 'Enter' && setIsEditingName(false)}
-                  className="font-semibold text-lg border-none p-0 h-auto focus:ring-0"
-                  autoFocus
-                />
-              ) : (
-                <h1 
-                  className="font-semibold cursor-pointer hover:bg-gray-100 px-2 py-1 rounded flex items-center gap-2"
-                  onClick={() => setIsEditingName(true)}
-                >
-                  {project.name}
-                  <Edit2 className="w-4 h-4 text-gray-400" />
-                </h1>
-              )}
-              <span className="text-sm text-gray-500">({canvasBlocks.length} blocks)</span>
-            </div>
-            
-            <ResponsiveControls
-              currentViewport={currentViewport}
-              onViewportChange={setCurrentViewport}
-            />
-          </div>
-          
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => saveProject()} disabled={saving}>
-              <Save className="w-4 h-4 mr-1" />
-              {saving ? 'Saving...' : 'Save'}
-            </Button>
-            <Button 
-              size="sm" 
-              onClick={publishProject}
-              variant={project.is_published ? "outline" : "default"}
-            >
-              <Globe className="w-4 h-4 mr-1" />
-              {project.is_published ? 'Unpublish' : 'Publish'}
-            </Button>
-          </div>
-        </div>
+      {/* Main Content */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar */}
+        <ModernSidebar
+          selectedBlock={selectedBlock}
+          onAddBlock={addBlockToCanvas}
+          onUpdateBlock={(updatedBlock) => {
+            setCanvasBlocks(blocks => 
+              blocks.map(block => 
+                block.id === updatedBlock.id ? updatedBlock : block
+              )
+            );
+          }}
+          templates={templates}
+          onLoadTemplate={loadTemplate}
+          project={project}
+          blocks={canvasBlocks}
+          currentViewport={currentViewport}
+          useAdvancedStyles={useAdvancedStyles}
+          onToggleAdvancedStyles={() => setUseAdvancedStyles(!useAdvancedStyles)}
+        />
 
         {/* Canvas */}
-        <div className="flex-1 overflow-auto p-8">
-          <div className={`mx-auto transition-all duration-300 ${getCanvasWidth()}`}>
-            <DragDropCanvas 
-              blocks={canvasBlocks}
-              onSelectBlock={setSelectedBlock}
-              selectedBlock={selectedBlock}
-              isPreviewMode={isPreviewMode}
-              onUpdateBlocks={setCanvasBlocks}
-              onAddBlock={addBlockToCanvas}
-            />
-          </div>
-        </div>
+        <ModernCanvas
+          blocks={canvasBlocks}
+          onSelectBlock={setSelectedBlock}
+          selectedBlock={selectedBlock}
+          isPreviewMode={isPreviewMode}
+          onUpdateBlocks={setCanvasBlocks}
+          onAddBlock={addBlockToCanvas}
+          currentViewport={currentViewport}
+        />
       </div>
     </div>
   );
