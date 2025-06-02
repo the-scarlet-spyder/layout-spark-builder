@@ -45,6 +45,7 @@ export type Database = {
           is_published: boolean | null
           name: string
           published_at: string | null
+          published_url: string | null
           slug: string
           template_id: string | null
           updated_at: string | null
@@ -58,6 +59,7 @@ export type Database = {
           is_published?: boolean | null
           name: string
           published_at?: string | null
+          published_url?: string | null
           slug: string
           template_id?: string | null
           updated_at?: string | null
@@ -71,6 +73,7 @@ export type Database = {
           is_published?: boolean | null
           name?: string
           published_at?: string | null
+          published_url?: string | null
           slug?: string
           template_id?: string | null
           updated_at?: string | null

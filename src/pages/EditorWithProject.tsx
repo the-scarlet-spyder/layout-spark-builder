@@ -32,7 +32,7 @@ interface Project {
   slug: string;
   blocks: any[];
   is_published: boolean;
-  published_url?: string;
+  published_url?: string | null;
 }
 
 interface Template {
@@ -95,7 +95,7 @@ export default function EditorWithProject() {
         slug: data.slug,
         blocks: Array.isArray(data.blocks) ? data.blocks : [],
         is_published: data.is_published || false,
-        published_url: data.published_url || undefined
+        published_url: data.published_url || null
       };
       
       setProject(projectData);
