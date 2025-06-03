@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -21,7 +20,10 @@ import {
   Palette,
   Upload,
   Layout,
-  Layers
+  Layers,
+  Globe,
+  Menu,
+  Mail
 } from "lucide-react";
 
 interface ElementLibraryProps {
@@ -62,6 +64,61 @@ const ELEMENT_CATEGORIES = [
     ]
   },
   {
+    id: 'blocks',
+    name: 'Blocks',
+    icon: Layout,
+    elements: [
+      { 
+        id: 'hero-section', 
+        name: 'Hero Section', 
+        icon: Globe, 
+        type: 'block' as const,
+        blockType: 'hero',
+        props: { 
+          backgroundColor: '#1f2937',
+          width: 800,
+          height: 400
+        }
+      },
+      { 
+        id: 'navbar', 
+        name: 'Navigation Bar', 
+        icon: Menu, 
+        type: 'block' as const,
+        blockType: 'navbar',
+        props: { 
+          backgroundColor: '#ffffff',
+          width: 800,
+          height: 60
+        }
+      },
+      { 
+        id: 'footer', 
+        name: 'Footer', 
+        icon: Layout, 
+        type: 'block' as const,
+        blockType: 'footer',
+        props: { 
+          backgroundColor: '#374151',
+          width: 800,
+          height: 200
+        }
+      },
+      { 
+        id: 'contact-form', 
+        name: 'Contact Form', 
+        icon: Mail, 
+        type: 'block' as const,
+        blockType: 'contact',
+        props: { 
+          backgroundColor: '#f9fafb',
+          width: 400,
+          height: 300
+        }
+      }
+    ]
+  },
+  {
     id: 'media',
     name: 'Media',
     icon: ImageIcon,
@@ -74,7 +131,7 @@ const ELEMENT_CATEGORIES = [
 
 export const ElementLibrary: React.FC<ElementLibraryProps> = ({ className = "" }) => {
   const { addElement } = useCanvas();
-  const [activeCategory, setActiveCategory] = useState('shapes');
+  const [activeCategory, setActiveCategory] = useState('blocks');
   const [searchQuery, setSearchQuery] = useState('');
 
   const activeElements = ELEMENT_CATEGORIES.find(cat => cat.id === activeCategory)?.elements || [];
@@ -82,33 +139,382 @@ export const ElementLibrary: React.FC<ElementLibraryProps> = ({ className = "" }
     element.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const createBlockElements = (blockType: string, x: number, y: number) => {
+    const elements = [];
+    
+    switch (blockType) {
+      case 'hero':
+        // Background container
+        elements.push({
+          type: 'rectangle' as const,
+          x, y,
+          width: 800,
+          height: 400,
+          rotation: 0,
+          visible: true,
+          locked: false,
+          name: 'Hero Background',
+          props: {
+            backgroundColor: '#1f2937',
+            opacity: 1
+          }
+        });
+        
+        // Hero title
+        elements.push({
+          type: 'text' as const,
+          x: x + 100,
+          y: y + 120,
+          width: 600,
+          height: 80,
+          rotation: 0,
+          visible: true,
+          locked: false,
+          name: 'Hero Title',
+          props: {
+            text: 'Build Something Amazing',
+            fontSize: 48,
+            fontWeight: 'bold',
+            textColor: '#ffffff',
+            textAlign: 'center' as const,
+            opacity: 1
+          }
+        });
+        
+        // Hero subtitle
+        elements.push({
+          type: 'text' as const,
+          x: x + 150,
+          y: y + 220,
+          width: 500,
+          height: 50,
+          rotation: 0,
+          visible: true,
+          locked: false,
+          name: 'Hero Subtitle',
+          props: {
+            text: 'Create beautiful websites with our drag-and-drop editor',
+            fontSize: 18,
+            fontWeight: 'normal',
+            textColor: '#d1d5db',
+            textAlign: 'center' as const,
+            opacity: 1
+          }
+        });
+        
+        // CTA Button
+        elements.push({
+          type: 'button' as const,
+          x: x + 325,
+          y: y + 300,
+          width: 150,
+          height: 50,
+          rotation: 0,
+          visible: true,
+          locked: false,
+          name: 'CTA Button',
+          props: {
+            text: 'Get Started',
+            backgroundColor: '#8A2BE2',
+            textColor: '#ffffff',
+            fontSize: 16,
+            fontWeight: '500',
+            textAlign: 'center' as const,
+            border: { width: 0, style: 'solid', color: '#8A2BE2', radius: 8 },
+            opacity: 1
+          }
+        });
+        break;
+        
+      case 'navbar':
+        // Navbar background
+        elements.push({
+          type: 'rectangle' as const,
+          x, y,
+          width: 800,
+          height: 60,
+          rotation: 0,
+          visible: true,
+          locked: false,
+          name: 'Navbar Background',
+          props: {
+            backgroundColor: '#ffffff',
+            border: { width: 1, style: 'solid', color: '#e5e7eb', radius: 0 },
+            opacity: 1
+          }
+        });
+        
+        // Logo
+        elements.push({
+          type: 'text' as const,
+          x: x + 20,
+          y: y + 15,
+          width: 100,
+          height: 30,
+          rotation: 0,
+          visible: true,
+          locked: false,
+          name: 'Logo',
+          props: {
+            text: 'Brand',
+            fontSize: 24,
+            fontWeight: 'bold',
+            textColor: '#1f2937',
+            textAlign: 'left' as const,
+            opacity: 1
+          }
+        });
+        
+        // Nav links
+        const navItems = ['Home', 'About', 'Services', 'Contact'];
+        navItems.forEach((item, index) => {
+          elements.push({
+            type: 'text' as const,
+            x: x + 500 + (index * 80),
+            y: y + 20,
+            width: 70,
+            height: 20,
+            rotation: 0,
+            visible: true,
+            locked: false,
+            name: `Nav ${item}`,
+            props: {
+              text: item,
+              fontSize: 16,
+              fontWeight: 'normal',
+              textColor: '#6b7280',
+              textAlign: 'center' as const,
+              opacity: 1
+            }
+          });
+        });
+        break;
+        
+      case 'footer':
+        // Footer background
+        elements.push({
+          type: 'rectangle' as const,
+          x, y,
+          width: 800,
+          height: 200,
+          rotation: 0,
+          visible: true,
+          locked: false,
+          name: 'Footer Background',
+          props: {
+            backgroundColor: '#374151',
+            opacity: 1
+          }
+        });
+        
+        // Footer content
+        elements.push({
+          type: 'text' as const,
+          x: x + 50,
+          y: y + 30,
+          width: 200,
+          height: 30,
+          rotation: 0,
+          visible: true,
+          locked: false,
+          name: 'Footer Title',
+          props: {
+            text: 'Your Company',
+            fontSize: 20,
+            fontWeight: 'bold',
+            textColor: '#ffffff',
+            textAlign: 'left' as const,
+            opacity: 1
+          }
+        });
+        
+        elements.push({
+          type: 'text' as const,
+          x: x + 50,
+          y: y + 70,
+          width: 300,
+          height: 80,
+          rotation: 0,
+          visible: true,
+          locked: false,
+          name: 'Footer Description',
+          props: {
+            text: 'Building amazing experiences for our customers worldwide.',
+            fontSize: 14,
+            fontWeight: 'normal',
+            textColor: '#d1d5db',
+            textAlign: 'left' as const,
+            opacity: 1
+          }
+        });
+        
+        elements.push({
+          type: 'text' as const,
+          x: x + 250,
+          y: y + 160,
+          width: 300,
+          height: 20,
+          rotation: 0,
+          visible: true,
+          locked: false,
+          name: 'Copyright',
+          props: {
+            text: '© 2024 Your Company. All rights reserved.',
+            fontSize: 12,
+            fontWeight: 'normal',
+            textColor: '#9ca3af',
+            textAlign: 'center' as const,
+            opacity: 1
+          }
+        });
+        break;
+        
+      case 'contact':
+        // Form background
+        elements.push({
+          type: 'rectangle' as const,
+          x, y,
+          width: 400,
+          height: 300,
+          rotation: 0,
+          visible: true,
+          locked: false,
+          name: 'Form Background',
+          props: {
+            backgroundColor: '#f9fafb',
+            border: { width: 1, style: 'solid', color: '#e5e7eb', radius: 8 },
+            opacity: 1
+          }
+        });
+        
+        // Form title
+        elements.push({
+          type: 'text' as const,
+          x: x + 20,
+          y: y + 20,
+          width: 360,
+          height: 30,
+          rotation: 0,
+          visible: true,
+          locked: false,
+          name: 'Form Title',
+          props: {
+            text: 'Contact Us',
+            fontSize: 24,
+            fontWeight: 'bold',
+            textColor: '#1f2937',
+            textAlign: 'center' as const,
+            opacity: 1
+          }
+        });
+        
+        // Input fields
+        ['Name', 'Email', 'Message'].forEach((label, index) => {
+          const inputY = y + 70 + (index * 60);
+          const inputHeight = label === 'Message' ? 80 : 40;
+          
+          elements.push({
+            type: 'rectangle' as const,
+            x: x + 20,
+            y: inputY,
+            width: 360,
+            height: inputHeight,
+            rotation: 0,
+            visible: true,
+            locked: false,
+            name: `${label} Input`,
+            props: {
+              backgroundColor: '#ffffff',
+              border: { width: 1, style: 'solid', color: '#d1d5db', radius: 4 },
+              opacity: 1
+            }
+          });
+          
+          elements.push({
+            type: 'text' as const,
+            x: x + 30,
+            y: inputY + 10,
+            width: 100,
+            height: 20,
+            rotation: 0,
+            visible: true,
+            locked: false,
+            name: `${label} Label`,
+            props: {
+              text: label,
+              fontSize: 14,
+              fontWeight: 'normal',
+              textColor: '#6b7280',
+              textAlign: 'left' as const,
+              opacity: 1
+            }
+          });
+        });
+        
+        // Submit button
+        elements.push({
+          type: 'button' as const,
+          x: x + 20,
+          y: y + 250,
+          width: 360,
+          height: 40,
+          rotation: 0,
+          visible: true,
+          locked: false,
+          name: 'Submit Button',
+          props: {
+            text: 'Send Message',
+            backgroundColor: '#8A2BE2',
+            textColor: '#ffffff',
+            fontSize: 16,
+            fontWeight: '500',
+            textAlign: 'center' as const,
+            border: { width: 0, style: 'solid', color: '#8A2BE2', radius: 6 },
+            opacity: 1
+          }
+        });
+        break;
+    }
+    
+    return elements;
+  };
+
   const handleAddElement = (elementConfig: any) => {
-    const defaultProps = {
-      backgroundColor: '#e5e7eb',
-      opacity: 1,
-      text: elementConfig.type === 'text' ? 'New Text' : elementConfig.type === 'button' ? 'Button' : undefined,
-      fontSize: elementConfig.props?.fontSize || (elementConfig.type === 'text' ? 16 : undefined),
-      fontWeight: elementConfig.props?.fontWeight || 'normal',
-      textColor: elementConfig.type === 'text' ? '#000000' : elementConfig.type === 'button' ? '#ffffff' : undefined,
-      textAlign: 'center' as const,
-      border: elementConfig.props?.border || undefined,
-      ...elementConfig.props
-    };
+    if (elementConfig.type === 'block') {
+      // Add multiple elements for block types
+      const blockElements = createBlockElements(elementConfig.blockType, 100, 100);
+      blockElements.forEach(element => {
+        addElement(element);
+      });
+    } else {
+      // Add single element
+      const defaultProps = {
+        backgroundColor: '#e5e7eb',
+        opacity: 1,
+        text: elementConfig.type === 'text' ? 'New Text' : elementConfig.type === 'button' ? 'Button' : undefined,
+        fontSize: elementConfig.props?.fontSize || (elementConfig.type === 'text' ? 16 : undefined),
+        fontWeight: elementConfig.props?.fontWeight || 'normal',
+        textColor: elementConfig.type === 'text' ? '#000000' : elementConfig.type === 'button' ? '#ffffff' : undefined,
+        textAlign: 'center' as const,
+        border: elementConfig.props?.border || undefined,
+        ...elementConfig.props
+      };
 
-    const element = {
-      type: elementConfig.type,
-      x: 100,
-      y: 100,
-      width: elementConfig.type === 'text' ? 200 : elementConfig.type === 'button' ? 120 : 100,
-      height: elementConfig.type === 'text' ? 50 : elementConfig.type === 'button' ? 40 : 100,
-      rotation: 0,
-      visible: true,
-      locked: false,
-      name: elementConfig.name,
-      props: defaultProps
-    };
+      const element = {
+        type: elementConfig.type,
+        x: 100,
+        y: 100,
+        width: elementConfig.type === 'text' ? 200 : elementConfig.type === 'button' ? 120 : 100,
+        height: elementConfig.type === 'text' ? 50 : elementConfig.type === 'button' ? 40 : 100,
+        rotation: 0,
+        visible: true,
+        locked: false,
+        name: elementConfig.name,
+        props: defaultProps
+      };
 
-    addElement(element);
+      addElement(element);
+    }
   };
 
   return (

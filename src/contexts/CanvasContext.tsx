@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useReducer, useCallback, ReactNode } from 'react';
 
 export interface GridElement {
@@ -126,6 +125,7 @@ type CanvasAction =
   | { type: 'SET_GRID_SIZE'; payload: { size: number } }
   | { type: 'TOGGLE_SNAP_TO_GRID'; payload?: undefined }
   | { type: 'TOGGLE_SNAP_TO_ELEMENTS'; payload?: undefined }
+  | { type: 'LOAD_PROJECT'; payload: CanvasState }
   | { type: 'UNDO'; payload?: undefined }
   | { type: 'REDO'; payload?: undefined };
 
@@ -320,6 +320,10 @@ const canvasReducer = (state: CanvasState, action: CanvasAction): CanvasState =>
       return { ...state, snapToElements: !state.snapToElements };
     }
     
+    case 'LOAD_PROJECT': {
+      return action.payload;
+    }
+    
     default:
       return state;
   }
@@ -350,6 +354,15 @@ const historyReducer = (state: HistoryState, action: CanvasAction): HistoryState
         past: [...state.past, state.present].slice(-MAX_HISTORY_SIZE),
         present: next,
         future: newFuture
+      };
+    }
+    
+    case 'LOAD_PROJECT': {
+      // When loading a project, reset history
+      return {
+        past: [],
+        present: action.payload,
+        future: []
       };
     }
     
