@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { useCanvas } from "@/contexts/CanvasContext";
 
@@ -15,6 +14,8 @@ interface EnhancedCanvasProps {
 export const EnhancedCanvas: React.FC<EnhancedCanvasProps> = ({ isPreviewMode }) => {
   const { state, dispatch, selectElements, moveSelectedElements, addElement } = useCanvas();
   const [isDragging, setIsDragging] = useState(false);
+  const [isResizing, setIsResizing] = useState(false);
+  const [resizeHandle, setResizeHandle] = useState<string | null>(null);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [guides, setGuides] = useState<Guide[]>([]);
   const [marqueeSelection, setMarqueeSelection] = useState<{
@@ -81,6 +82,78 @@ export const EnhancedCanvas: React.FC<EnhancedCanvasProps> = ({ isPreviewMode })
     if (!state.snapToGrid) return value;
     return Math.round(value / state.gridSize) * state.gridSize;
   }, [state.snapToGrid, state.gridSize]);
+
+  const handleElementResize = useCallback((e: React.MouseEvent, elementId: string, handle: string) => {
+    e.stopPropagation();
+    setIsResizing(true);
+    setResizeHandle(handle);
+    setDragStart({ x: e.clientX, y: e.clientY });
+    console.log('Starting resize for element:', elementId, 'handle:', handle);
+  }, []);
+
+  const handleResizeMouseMove = useCallback((e: MouseEvent) => {
+    if (!isResizing || !resizeHandle || state.selectedElementIds.length === 0) return;
+
+    const deltaX = e.clientX - dragStart.x;
+    const deltaY = e.clientY - dragStart.y;
+    
+    const selectedElement = currentPage.elements.find(el => el.id === state.selectedElementIds[0]);
+    if (!selectedElement) return;
+
+    let newWidth = selectedElement.width;
+    let newHeight = selectedElement.height;
+    let newX = selectedElement.x;
+    let newY = selectedElement.y;
+
+    // Handle different resize directions
+    if (resizeHandle.includes('right')) {
+      newWidth = Math.max(20, selectedElement.width + deltaX / zoomScale);
+    }
+    if (resizeHandle.includes('left')) {
+      const widthDelta = deltaX / zoomScale;
+      newWidth = Math.max(20, selectedElement.width - widthDelta);
+      newX = selectedElement.x + widthDelta;
+    }
+    if (resizeHandle.includes('bottom')) {
+      newHeight = Math.max(20, selectedElement.height + deltaY / zoomScale);
+    }
+    if (resizeHandle.includes('top')) {
+      const heightDelta = deltaY / zoomScale;
+      newHeight = Math.max(20, selectedElement.height - heightDelta);
+      newY = selectedElement.y + heightDelta;
+    }
+
+    dispatch({ 
+      type: 'UPDATE_ELEMENT', 
+      payload: { 
+        id: selectedElement.id, 
+        updates: { 
+          width: snapToGrid(newWidth), 
+          height: snapToGrid(newHeight),
+          x: snapToGrid(newX),
+          y: snapToGrid(newY)
+        } 
+      } 
+    });
+
+    setDragStart({ x: e.clientX, y: e.clientY });
+  }, [isResizing, resizeHandle, state.selectedElementIds, currentPage.elements, dragStart, zoomScale, snapToGrid, dispatch]);
+
+  const handleResizeMouseUp = useCallback(() => {
+    setIsResizing(false);
+    setResizeHandle(null);
+  }, []);
+
+  useEffect(() => {
+    if (isResizing) {
+      document.addEventListener('mousemove', handleResizeMouseMove);
+      document.addEventListener('mouseup', handleResizeMouseUp);
+      return () => {
+        document.removeEventListener('mousemove', handleResizeMouseMove);
+        document.removeEventListener('mouseup', handleResizeMouseUp);
+      };
+    }
+  }, [isResizing, handleResizeMouseMove, handleResizeMouseUp]);
 
   const handleCanvasMouseDown = useCallback((e: React.MouseEvent) => {
     if (isPreviewMode || e.button !== 0) return;
@@ -203,6 +276,17 @@ export const EnhancedCanvas: React.FC<EnhancedCanvasProps> = ({ isPreviewMode })
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (isPreviewMode) return;
+    
+    // Check if user is typing in an input field
+    const activeElement = document.activeElement;
+    const isTyping = activeElement && (
+      activeElement.tagName === 'INPUT' || 
+      activeElement.tagName === 'TEXTAREA' || 
+      activeElement.hasAttribute('contenteditable') ||
+      activeElement.closest('[role="textbox"]')
+    );
+
+    if (isTyping) return; // Don't handle shortcuts when typing
 
     switch (e.key) {
       case 'Delete':
@@ -285,13 +369,42 @@ export const EnhancedCanvas: React.FC<EnhancedCanvasProps> = ({ isPreviewMode })
           <div className="w-full h-full rounded-full" />
         )}
         
-        {/* Selection handles */}
+        {/* Selection handles with proper resize functionality */}
         {isSelected && !isPreviewMode && (
           <>
-            <div className="absolute -top-1 -left-1 w-3 h-3 bg-[#8A2BE2] border-2 border-white rounded-sm cursor-nw-resize" />
-            <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#8A2BE2] border-2 border-white rounded-sm cursor-ne-resize" />
-            <div className="absolute -bottom-1 -left-1 w-3 h-3 bg-[#8A2BE2] border-2 border-white rounded-sm cursor-sw-resize" />
-            <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-[#8A2BE2] border-2 border-white rounded-sm cursor-se-resize" />
+            <div 
+              className="absolute -top-1 -left-1 w-3 h-3 bg-[#8A2BE2] border-2 border-white rounded-sm cursor-nw-resize" 
+              onMouseDown={(e) => handleElementResize(e, element.id, 'top-left')}
+            />
+            <div 
+              className="absolute -top-1 -right-1 w-3 h-3 bg-[#8A2BE2] border-2 border-white rounded-sm cursor-ne-resize"
+              onMouseDown={(e) => handleElementResize(e, element.id, 'top-right')}
+            />
+            <div 
+              className="absolute -bottom-1 -left-1 w-3 h-3 bg-[#8A2BE2] border-2 border-white rounded-sm cursor-sw-resize"
+              onMouseDown={(e) => handleElementResize(e, element.id, 'bottom-left')}
+            />
+            <div 
+              className="absolute -bottom-1 -right-1 w-3 h-3 bg-[#8A2BE2] border-2 border-white rounded-sm cursor-se-resize"
+              onMouseDown={(e) => handleElementResize(e, element.id, 'bottom-right')}
+            />
+            {/* Side handles */}
+            <div 
+              className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-[#8A2BE2] border-2 border-white rounded-sm cursor-n-resize"
+              onMouseDown={(e) => handleElementResize(e, element.id, 'top')}
+            />
+            <div 
+              className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-[#8A2BE2] border-2 border-white rounded-sm cursor-s-resize"
+              onMouseDown={(e) => handleElementResize(e, element.id, 'bottom')}
+            />
+            <div 
+              className="absolute -left-1 top-1/2 transform -translate-y-1/2 w-3 h-3 bg-[#8A2BE2] border-2 border-white rounded-sm cursor-w-resize"
+              onMouseDown={(e) => handleElementResize(e, element.id, 'left')}
+            />
+            <div 
+              className="absolute -right-1 top-1/2 transform -translate-y-1/2 w-3 h-3 bg-[#8A2BE2] border-2 border-white rounded-sm cursor-e-resize"
+              onMouseDown={(e) => handleElementResize(e, element.id, 'right')}
+            />
           </>
         )}
       </div>

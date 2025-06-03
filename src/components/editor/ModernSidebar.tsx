@@ -42,34 +42,34 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
   const [activeTab, setActiveTab] = useState('elements');
 
   return (
-    <div className="w-80 bg-[#1E1E2E] border-r border-[#2B2B3D] flex flex-col">
+    <div className="w-64 bg-[#1E1E2E] border-r border-[#2B2B3D] flex flex-col">
       {/* Tab Navigation */}
       <div className="border-b border-[#2B2B3D] p-2">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 bg-[#2B2B3D] h-10">
+          <TabsList className="grid w-full grid-cols-4 bg-[#2B2B3D] h-9">
             <TabsTrigger 
               value="elements" 
               className="text-xs data-[state=active]:bg-[#8A2BE2] data-[state=active]:text-white"
             >
-              <Palette className="w-4 h-4" />
+              <Palette className="w-3 h-3" />
             </TabsTrigger>
             <TabsTrigger 
               value="layers" 
               className="text-xs data-[state=active]:bg-[#8A2BE2] data-[state=active]:text-white"
             >
-              <Layers className="w-4 h-4" />
+              <Layers className="w-3 h-3" />
             </TabsTrigger>
             <TabsTrigger 
               value="assets" 
               className="text-xs data-[state=active]:bg-[#8A2BE2] data-[state=active]:text-white"
             >
-              <Upload className="w-4 h-4" />
+              <Upload className="w-3 h-3" />
             </TabsTrigger>
             <TabsTrigger 
               value="templates" 
               className="text-xs data-[state=active]:bg-[#8A2BE2] data-[state=active]:text-white"
             >
-              <Layout className="w-4 h-4" />
+              <Layout className="w-3 h-3" />
             </TabsTrigger>
           </TabsList>
 
@@ -82,15 +82,15 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
           </TabsContent>
 
           <TabsContent value="assets" className="m-0 p-0">
-            <div className="p-4">
-              <div className="text-center py-8 text-gray-400">
-                <div className="w-16 h-16 bg-[#2B2B3D] rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Upload className="w-8 h-8 text-gray-500" />
+            <div className="p-3">
+              <div className="text-center py-6 text-gray-400">
+                <div className="w-12 h-12 bg-[#2B2B3D] rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Upload className="w-6 h-6 text-gray-500" />
                 </div>
-                <h3 className="text-lg font-medium mb-2 text-white">Upload Assets</h3>
-                <p className="text-sm mb-4">Upload images, videos, and other media files</p>
-                <Button className="bg-[#8A2BE2] hover:bg-[#7A1BCF] text-white">
-                  <Upload className="w-4 h-4 mr-2" />
+                <h3 className="text-sm font-medium mb-2 text-white">Upload Assets</h3>
+                <p className="text-xs mb-3">Upload images, videos, and other media files</p>
+                <Button size="sm" className="bg-[#8A2BE2] hover:bg-[#7A1BCF] text-white">
+                  <Upload className="w-3 h-3 mr-1" />
                   Upload Files
                 </Button>
               </div>
@@ -98,21 +98,22 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
           </TabsContent>
 
           <TabsContent value="templates" className="m-0 p-0">
-            <div className="p-4">
-              <div className="text-center py-8 text-gray-400">
-                <div className="w-16 h-16 bg-[#2B2B3D] rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Layout className="w-8 h-8 text-gray-500" />
+            <div className="p-3">
+              <div className="text-center py-6 text-gray-400">
+                <div className="w-12 h-12 bg-[#2B2B3D] rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Layout className="w-6 h-6 text-gray-500" />
                 </div>
-                <h3 className="text-lg font-medium mb-2 text-white">Templates</h3>
-                <p className="text-sm mb-4">Pre-designed layouts and components</p>
+                <h3 className="text-sm font-medium mb-2 text-white">Templates</h3>
+                <p className="text-xs mb-3">Pre-designed layouts and components</p>
                 <div className="space-y-2">
                   <Button 
                     variant="outline" 
+                    size="sm"
                     className="w-full border-[#3B3B4D] text-gray-300 hover:text-white hover:bg-[#2B2B3D]"
                   >
                     Browse Templates
                   </Button>
-                  <Badge variant="secondary" className="bg-[#8A2BE2] text-white">
+                  <Badge variant="secondary" className="bg-[#8A2BE2] text-white text-xs">
                     Coming Soon
                   </Badge>
                 </div>

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -37,11 +36,10 @@ function EditorContent() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
-  const [isEditingName, setIsEditingName] = useState(false);
   const [templates, setTemplates] = useState<Template[]>([]);
   const [useAdvancedStyles, setUseAdvancedStyles] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
 
-  // Auto-save functionality
   useEffect(() => {
     const autoSaveInterval = setInterval(() => {
       if (project) {
@@ -229,7 +227,7 @@ function EditorContent() {
 
       {/* Main Content */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Left Sidebar */}
+        {/* Left Sidebar - Smaller */}
         <ModernSidebar
           selectedBlock={null}
           onAddBlock={addBlockToCanvas}
@@ -243,13 +241,13 @@ function EditorContent() {
           onToggleAdvancedStyles={() => setUseAdvancedStyles(!useAdvancedStyles)}
         />
 
-        {/* Canvas - Now more spacious */}
+        {/* Canvas - Much more spacious now */}
         <div className="flex-1 flex flex-col min-w-0">
           <EnhancedCanvas isPreviewMode={isPreviewMode} />
         </div>
         
-        {/* Right Properties Panel */}
-        <div className="w-80 bg-white border-l border-gray-200 flex-shrink-0">
+        {/* Right Properties Panel - Smaller */}
+        <div className="w-72 bg-white border-l border-gray-200 flex-shrink-0">
           <PropertiesPanel />
         </div>
       </div>
