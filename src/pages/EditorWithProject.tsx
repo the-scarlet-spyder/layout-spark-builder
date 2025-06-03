@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -36,7 +37,7 @@ function EditorContent() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
-  const [isEditingName, setIsEditingName] = useState(isEditingName);
+  const [isEditingName, setIsEditingName] = useState(false);
   const [templates, setTemplates] = useState<Template[]>([]);
   const [useAdvancedStyles, setUseAdvancedStyles] = useState(false);
 

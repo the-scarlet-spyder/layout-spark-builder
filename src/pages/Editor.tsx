@@ -19,7 +19,6 @@ import {
 } from "lucide-react";
 import { DragDropCanvas } from "@/components/editor/DragDropCanvas";
 import { BlockLibrary } from "@/components/editor/BlockLibrary";
-import { PropertiesPanel } from "@/components/editor/PropertiesPanel";
 import { templates } from "@/data/templates";
 import { useSearchParams } from "react-router-dom";
 
@@ -335,16 +334,13 @@ const Editor = () => {
           </TabsContent>
           
           <TabsContent value="properties" className="flex-1 p-4 pt-0 overflow-hidden">
-            <PropertiesPanel 
-              selectedBlock={selectedBlock}
-              onUpdateBlock={(updatedBlock) => {
-                setCanvasBlocks(blocks => 
-                  blocks.map(block => 
-                    block.id === updatedBlock.id ? updatedBlock : block
-                  )
-                );
-              }}
-            />
+            <div className="text-center py-8 text-gray-400">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Settings className="w-8 h-8 text-gray-500" />
+              </div>
+              <h3 className="text-lg font-medium mb-2 text-gray-700">Properties Panel</h3>
+              <p className="text-sm">Select an element to view its properties</p>
+            </div>
           </TabsContent>
         </Tabs>
       </div>
