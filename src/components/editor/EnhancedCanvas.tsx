@@ -55,13 +55,6 @@ export const EnhancedCanvas: React.FC<EnhancedCanvasProps> = ({ isPreviewMode })
             elementIds: [draggingEl.id, staticEl.id]
           });
         }
-        if (Math.abs(draggingEl.x + draggingEl.width / 2 - (staticEl.x + staticEl.width / 2)) < 5) {
-          newGuides.push({
-            type: 'vertical',
-            position: staticEl.x + staticEl.width / 2,
-            elementIds: [draggingEl.id, staticEl.id]
-          });
-        }
 
         // Horizontal alignment guides
         if (Math.abs(draggingEl.y - staticEl.y) < 5) {
@@ -75,13 +68,6 @@ export const EnhancedCanvas: React.FC<EnhancedCanvasProps> = ({ isPreviewMode })
           newGuides.push({
             type: 'horizontal',
             position: staticEl.y + staticEl.height,
-            elementIds: [draggingEl.id, staticEl.id]
-          });
-        }
-        if (Math.abs(draggingEl.y + draggingEl.height / 2 - (staticEl.y + staticEl.height / 2)) < 5) {
-          newGuides.push({
-            type: 'horizontal',
-            position: staticEl.y + staticEl.height / 2,
             elementIds: [draggingEl.id, staticEl.id]
           });
         }
@@ -99,11 +85,11 @@ export const EnhancedCanvas: React.FC<EnhancedCanvasProps> = ({ isPreviewMode })
   const handleCanvasMouseDown = useCallback((e: React.MouseEvent) => {
     if (isPreviewMode || e.button !== 0) return;
 
-    const rect = canvasRef.current?.getBoundingClientRect();
+    const rect = frameRef.current?.getBoundingClientRect();
     if (!rect) return;
 
-    const x = (e.clientX - rect.left - state.pan.x) / zoomScale;
-    const y = (e.clientY - rect.top - state.pan.y) / zoomScale;
+    const x = (e.clientX - rect.left) / zoomScale;
+    const y = (e.clientY - rect.top) / zoomScale;
 
     // Check if clicking on an element
     const clickedElement = currentPage.elements
@@ -141,16 +127,16 @@ export const EnhancedCanvas: React.FC<EnhancedCanvasProps> = ({ isPreviewMode })
 
     setDragStart({ x: e.clientX, y: e.clientY });
     setIsDragging(true);
-  }, [isPreviewMode, currentPage.elements, state.selectedElementIds, state.pan, zoomScale, selectElements]);
+  }, [isPreviewMode, currentPage.elements, state.selectedElementIds, zoomScale, selectElements]);
 
   const handleCanvasMouseMove = useCallback((e: React.MouseEvent) => {
     if (!isDragging) return;
 
-    const rect = canvasRef.current?.getBoundingClientRect();
+    const rect = frameRef.current?.getBoundingClientRect();
     if (!rect) return;
 
-    const x = (e.clientX - rect.left - state.pan.x) / zoomScale;
-    const y = (e.clientY - rect.top - state.pan.y) / zoomScale;
+    const x = (e.clientX - rect.left) / zoomScale;
+    const y = (e.clientY - rect.top) / zoomScale;
 
     if (marqueeSelection) {
       // Update marquee selection
@@ -200,7 +186,6 @@ export const EnhancedCanvas: React.FC<EnhancedCanvasProps> = ({ isPreviewMode })
     marqueeSelection, 
     currentPage.elements, 
     state.selectedElementIds, 
-    state.pan, 
     zoomScale, 
     dragStart, 
     snapToGrid, 
@@ -229,12 +214,6 @@ export const EnhancedCanvas: React.FC<EnhancedCanvasProps> = ({ isPreviewMode })
       case 'Escape':
         selectElements([]);
         break;
-      case 'g':
-        if (e.metaKey || e.ctrlKey) {
-          e.preventDefault();
-          dispatch({ type: 'TOGGLE_GRID' });
-        }
-        break;
     }
   }, [isPreviewMode, state.selectedElementIds, dispatch, selectElements]);
 
@@ -250,7 +229,7 @@ export const EnhancedCanvas: React.FC<EnhancedCanvasProps> = ({ isPreviewMode })
       <div
         key={element.id}
         className={`absolute cursor-move select-none transition-all ${
-          isSelected ? 'ring-2 ring-[#8A2BE2] ring-offset-2 ring-offset-white' : ''
+          isSelected ? 'ring-2 ring-[#8A2BE2] ring-offset-2' : ''
         } ${!element.visible ? 'opacity-50' : ''} ${element.locked ? 'pointer-events-none' : ''}`}
         style={{
           left: element.x,
@@ -269,7 +248,7 @@ export const EnhancedCanvas: React.FC<EnhancedCanvasProps> = ({ isPreviewMode })
       >
         {element.type === 'text' && (
           <div 
-            className="w-full h-full flex items-center justify-center"
+            className="w-full h-full flex items-center justify-center p-2"
             style={{ 
               color: element.props?.textColor || '#000000',
               fontSize: element.props?.fontSize || 16,
@@ -313,9 +292,6 @@ export const EnhancedCanvas: React.FC<EnhancedCanvasProps> = ({ isPreviewMode })
             <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#8A2BE2] border-2 border-white rounded-sm cursor-ne-resize" />
             <div className="absolute -bottom-1 -left-1 w-3 h-3 bg-[#8A2BE2] border-2 border-white rounded-sm cursor-sw-resize" />
             <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-[#8A2BE2] border-2 border-white rounded-sm cursor-se-resize" />
-            
-            {/* Rotation handle */}
-            <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-[#8A2BE2] border-2 border-white rounded-full cursor-grab" />
           </>
         )}
       </div>
@@ -323,46 +299,44 @@ export const EnhancedCanvas: React.FC<EnhancedCanvasProps> = ({ isPreviewMode })
   };
 
   return (
-    <div className="flex-1 bg-[#141419] overflow-hidden relative">
-      {/* Canvas */}
+    <div className="flex-1 bg-[#F5F5F5] overflow-hidden relative">
+      {/* Canvas Container */}
       <div 
         ref={canvasRef}
-        className="w-full h-full overflow-auto cursor-crosshair"
-        onMouseDown={handleCanvasMouseDown}
-        onMouseMove={handleCanvasMouseMove}
-        onMouseUp={handleCanvasMouseUp}
+        className="w-full h-full overflow-auto"
         style={{
-          transform: `scale(${zoomScale}) translate(${state.pan.x}px, ${state.pan.y}px)`,
-          transformOrigin: '0 0'
+          transform: `scale(${zoomScale})`,
+          transformOrigin: 'top left'
         }}
       >
-        {/* Grid background */}
-        {state.showGrid && (
-          <div 
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              backgroundImage: `
-                linear-gradient(rgba(138, 43, 226, 0.2) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(138, 43, 226, 0.2) 1px, transparent 1px)
-              `,
-              backgroundSize: `${state.gridSize}px ${state.gridSize}px`
-            }}
-          />
-        )}
+        {/* Canvas Background with centering */}
+        <div className="min-w-full min-h-full flex items-center justify-center p-20">
+          {/* Grid background */}
+          {state.showGrid && (
+            <div 
+              className="absolute inset-0 pointer-events-none opacity-30"
+              style={{
+                backgroundImage: `
+                  linear-gradient(rgba(138, 43, 226, 0.3) 1px, transparent 1px),
+                  linear-gradient(90deg, rgba(138, 43, 226, 0.3) 1px, transparent 1px)
+                `,
+                backgroundSize: `${state.gridSize}px ${state.gridSize}px`
+              }}
+            />
+          )}
 
-        {/* Main frame */}
-        <div className="relative" style={{ width: '200vw', height: '200vh' }}>
+          {/* Main Design Frame */}
           <div 
             ref={frameRef}
-            className="relative bg-white border-2 border-[#8A2BE2] shadow-2xl overflow-hidden"
+            className="relative shadow-2xl border border-gray-300 overflow-hidden"
             style={{
               width: currentPage.frame.width,
               height: currentPage.frame.height,
-              left: '50%',
-              top: '50%',
-              transform: 'translate(-50%, -50%)',
-              backgroundColor: currentPage.frame.backgroundColor
+              backgroundColor: currentPage.frame.backgroundColor || '#ffffff'
             }}
+            onMouseDown={handleCanvasMouseDown}
+            onMouseMove={handleCanvasMouseMove}
+            onMouseUp={handleCanvasMouseUp}
           >
             {/* Elements */}
             {currentPage.elements.map(renderElement)}
@@ -392,6 +366,21 @@ export const EnhancedCanvas: React.FC<EnhancedCanvasProps> = ({ isPreviewMode })
                   height: Math.abs(marqueeSelection.currentY - marqueeSelection.startY)
                 }}
               />
+            )}
+
+            {/* Empty state when no elements */}
+            {currentPage.elements.length === 0 && !isPreviewMode && (
+              <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-medium mb-2">Start designing</h3>
+                  <p className="text-sm">Add elements from the left panel to get started</p>
+                </div>
+              </div>
             )}
           </div>
         </div>

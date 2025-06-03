@@ -213,7 +213,7 @@ function EditorContent() {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-[#141419] text-white">
+    <div className="h-screen flex flex-col bg-[#FAFAFA] text-gray-900">
       {/* Top Navigation */}
       <EnhancedTopBar
         project={project}
@@ -229,7 +229,7 @@ function EditorContent() {
 
       {/* Main Content */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar */}
+        {/* Left Sidebar */}
         <ModernSidebar
           selectedBlock={null}
           onAddBlock={addBlockToCanvas}
@@ -243,11 +243,15 @@ function EditorContent() {
           onToggleAdvancedStyles={() => setUseAdvancedStyles(!useAdvancedStyles)}
         />
 
-        {/* Canvas */}
-        <EnhancedCanvas isPreviewMode={isPreviewMode} />
+        {/* Canvas - Now more spacious */}
+        <div className="flex-1 flex flex-col min-w-0">
+          <EnhancedCanvas isPreviewMode={isPreviewMode} />
+        </div>
         
-        {/* Properties Panel */}
-        <PropertiesPanel />
+        {/* Right Properties Panel */}
+        <div className="w-80 bg-white border-l border-gray-200 flex-shrink-0">
+          <PropertiesPanel />
+        </div>
       </div>
     </div>
   );
