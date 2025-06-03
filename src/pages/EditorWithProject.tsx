@@ -5,9 +5,9 @@ import { CanvasProvider } from '@/contexts/CanvasContext';
 import { EnhancedTopBar } from "@/components/editor/EnhancedTopBar";
 import { EnhancedCanvas } from "@/components/editor/EnhancedCanvas";
 import { ModernSidebar } from "@/components/editor/ModernSidebar";
+import { FigmaStylePropertiesPanel } from "@/components/editor/FigmaStylePropertiesPanel";
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from "@/hooks/use-toast";
-import { PropertiesPanel } from "@/components/editor/PropertiesPanel";
 
 interface Project {
   id: string;
@@ -43,9 +43,9 @@ function EditorContent() {
   useEffect(() => {
     const autoSaveInterval = setInterval(() => {
       if (project) {
-        saveProject(true); // Silent save
+        saveProject(true);
       }
-    }, 30000); // Auto-save every 30 seconds
+    }, 30000);
 
     return () => clearInterval(autoSaveInterval);
   }, [project]);
@@ -177,42 +177,38 @@ function EditorContent() {
     }
   };
 
-  // Legacy block functions for backwards compatibility
   const addBlockToCanvas = (blockType: string) => {
-    // This will be handled by the new canvas system
     console.log('Legacy addBlockToCanvas called with:', blockType);
   };
 
   const loadTemplate = (templateId: string) => {
     const template = templates.find(t => t.id === templateId);
     if (template) {
-      // Convert template blocks to canvas elements
       console.log('Loading template:', template);
     }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#1E1E2E] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#8A2BE2]"></div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
       </div>
     );
   }
 
   if (!project) {
     return (
-      <div className="min-h-screen bg-[#1E1E2E] flex items-center justify-center">
-        <div className="text-white text-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
           <h2 className="text-2xl font-bold mb-2">Project not found</h2>
-          <p className="text-gray-400">The project you're looking for doesn't exist.</p>
+          <p className="text-gray-600">The project you're looking for doesn't exist.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="h-screen flex flex-col bg-[#FAFAFA] text-gray-900">
-      {/* Top Navigation */}
+    <div className="h-screen flex flex-col bg-white">
       <EnhancedTopBar
         project={project}
         isEditingName={isEditingName}
@@ -225,9 +221,7 @@ function EditorContent() {
         onPublish={publishProject}
       />
 
-      {/* Main Content */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Left Sidebar - Smaller */}
         <ModernSidebar
           selectedBlock={null}
           onAddBlock={addBlockToCanvas}
@@ -241,15 +235,11 @@ function EditorContent() {
           onToggleAdvancedStyles={() => setUseAdvancedStyles(!useAdvancedStyles)}
         />
 
-        {/* Canvas - Much more spacious now */}
         <div className="flex-1 flex flex-col min-w-0">
           <EnhancedCanvas isPreviewMode={isPreviewMode} />
         </div>
         
-        {/* Right Properties Panel - Smaller */}
-        <div className="w-72 bg-white border-l border-gray-200 flex-shrink-0">
-          <PropertiesPanel />
-        </div>
+        <FigmaStylePropertiesPanel />
       </div>
     </div>
   );
