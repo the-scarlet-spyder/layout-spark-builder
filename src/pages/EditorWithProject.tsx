@@ -36,7 +36,7 @@ function EditorContent() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
-  const { state, dispatch } = useCanvas();
+  const { state, dispatch, addElement } = useCanvas();
   
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
@@ -361,13 +361,182 @@ function EditorContent() {
   };
 
   const addBlockToCanvas = (blockType: string) => {
-    console.log('Legacy addBlockToCanvas called with:', blockType);
+    // Convert block types to canvas elements
+    switch (blockType) {
+      case 'text':
+        addElement({
+          type: 'text',
+          x: 100,
+          y: 100,
+          width: 200,
+          height: 50,
+          rotation: 0,
+          visible: true,
+          locked: false,
+          name: 'Text Element',
+          props: {
+            text: 'Enter your text here',
+            fontSize: 16,
+            fontFamily: 'Inter, sans-serif',
+            fontWeight: 'normal',
+            textColor: '#000000',
+            textAlign: 'left',
+            opacity: 1
+          }
+        });
+        break;
+        
+      case 'button':
+        addElement({
+          type: 'button',
+          x: 150,
+          y: 150,
+          width: 120,
+          height: 40,
+          rotation: 0,
+          visible: true,
+          locked: false,
+          name: 'Button Element',
+          props: {
+            text: 'Click me',
+            fontSize: 14,
+            fontFamily: 'Inter, sans-serif',
+            fontWeight: '500',
+            textColor: '#ffffff',
+            backgroundColor: '#3B82F6',
+            border: {
+              width: 0,
+              style: 'solid',
+              color: '#000000',
+              radius: 6
+            },
+            opacity: 1
+          }
+        });
+        break;
+        
+      case 'rectangle':
+        addElement({
+          type: 'rectangle',
+          x: 200,
+          y: 200,
+          width: 100,
+          height: 100,
+          rotation: 0,
+          visible: true,
+          locked: false,
+          name: 'Rectangle Element',
+          props: {
+            backgroundColor: '#E5E7EB',
+            border: {
+              width: 0,
+              style: 'solid',
+              color: '#000000',
+              radius: 0
+            },
+            opacity: 1
+          }
+        });
+        break;
+        
+      case 'circle':
+        addElement({
+          type: 'circle',
+          x: 250,
+          y: 250,
+          width: 80,
+          height: 80,
+          rotation: 0,
+          visible: true,
+          locked: false,
+          name: 'Circle Element',
+          props: {
+            backgroundColor: '#F3F4F6',
+            opacity: 1
+          }
+        });
+        break;
+        
+      case 'hero':
+        // Add a hero section with multiple elements
+        addElement({
+          type: 'rectangle',
+          x: 0,
+          y: 0,
+          width: 800,
+          height: 400,
+          rotation: 0,
+          visible: true,
+          locked: false,
+          name: 'Hero Background',
+          props: {
+            backgroundColor: '#1F2937',
+            opacity: 1
+          }
+        });
+        
+        addElement({
+          type: 'text',
+          x: 200,
+          y: 150,
+          width: 400,
+          height: 60,
+          rotation: 0,
+          visible: true,
+          locked: false,
+          name: 'Hero Title',
+          props: {
+            text: 'Welcome to Our Website',
+            fontSize: 32,
+            fontFamily: 'Inter, sans-serif',
+            fontWeight: 'bold',
+            textColor: '#ffffff',
+            textAlign: 'center',
+            opacity: 1
+          }
+        });
+        
+        addElement({
+          type: 'button',
+          x: 340,
+          y: 250,
+          width: 120,
+          height: 48,
+          rotation: 0,
+          visible: true,
+          locked: false,
+          name: 'Hero CTA Button',
+          props: {
+            text: 'Get Started',
+            fontSize: 16,
+            fontFamily: 'Inter, sans-serif',
+            fontWeight: '600',
+            textColor: '#ffffff',
+            backgroundColor: '#8B5CF6',
+            border: {
+              width: 0,
+              style: 'solid',
+              color: '#000000',
+              radius: 8
+            },
+            opacity: 1
+          }
+        });
+        break;
+        
+      default:
+        console.log('Unknown block type:', blockType);
+    }
   };
 
   const loadTemplate = (templateId: string) => {
     const template = templates.find(t => t.id === templateId);
     if (template) {
       console.log('Loading template:', template);
+      // Convert template blocks to canvas elements
+      template.blocks.forEach((block, index) => {
+        addBlockToCanvas(block.type || 'text');
+      });
     }
   };
 
