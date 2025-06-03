@@ -136,7 +136,7 @@ function EditorContent() {
         .update({
           name: project.name,
           blocks: project.blocks,
-          canvas_data: state,
+          canvas_data: JSON.parse(JSON.stringify(state)),
           updated_at: new Date().toISOString()
         })
         .eq('id', project.id);
@@ -172,7 +172,7 @@ function EditorContent() {
           is_published: !project.is_published,
           published_at: project.is_published ? null : new Date().toISOString(),
           blocks: project.blocks,
-          canvas_data: state
+          canvas_data: JSON.parse(JSON.stringify(state))
         })
         .eq('id', project.id);
 
