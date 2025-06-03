@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -8,6 +7,7 @@ import { EnhancedCanvas } from "@/components/editor/EnhancedCanvas";
 import { ModernSidebar } from "@/components/editor/ModernSidebar";
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from "@/hooks/use-toast";
+import { PropertiesPanel } from "@/components/editor/PropertiesPanel";
 
 interface Project {
   id: string;
@@ -36,7 +36,7 @@ function EditorContent() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
-  const [isEditingName, setIsEditingName] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(isEditingName);
   const [templates, setTemplates] = useState<Template[]>([]);
   const [useAdvancedStyles, setUseAdvancedStyles] = useState(false);
 
@@ -244,6 +244,9 @@ function EditorContent() {
 
         {/* Canvas */}
         <EnhancedCanvas isPreviewMode={isPreviewMode} />
+        
+        {/* Properties Panel */}
+        <PropertiesPanel />
       </div>
     </div>
   );
