@@ -88,7 +88,7 @@ function EditorContent() {
       setProject(projectData);
       
       // Load canvas data if it exists
-      if (projectData.canvas_data) {
+      if (projectData.canvas_data && Object.keys(projectData.canvas_data).length > 0) {
         dispatch({ type: 'LOAD_PROJECT', payload: projectData.canvas_data });
       }
     } catch (error) {

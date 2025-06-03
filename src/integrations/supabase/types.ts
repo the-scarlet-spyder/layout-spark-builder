@@ -39,6 +39,7 @@ export type Database = {
       projects: {
         Row: {
           blocks: Json
+          canvas_data: Json | null
           created_at: string | null
           description: string | null
           id: string
@@ -53,6 +54,7 @@ export type Database = {
         }
         Insert: {
           blocks?: Json
+          canvas_data?: Json | null
           created_at?: string | null
           description?: string | null
           id?: string
@@ -67,6 +69,7 @@ export type Database = {
         }
         Update: {
           blocks?: Json
+          canvas_data?: Json | null
           created_at?: string | null
           description?: string | null
           id?: string
